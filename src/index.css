@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+@import "tailwindcss";
+
+:root {
+  font-family: "Oswald", serif,Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: #ffffff;
+  background-color: #242424;
+  --color-primary: #b3840e;
+  --color-secondary: #151A20FF;
+  --color-text:#ae8827dd;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+*{
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: 1rem;
+  line-height: var(--line-height);
+  font-weight: var(--font-weight);
+  color: var(--color);
+  background-color: var(--background-color);
+}
+
+*[class^='btn']{
+  display: inline-block;
+  padding: 0.5rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  text-transform: uppercase;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 0.5s ease;
+}
+
+.btn-outline{
+  background-color: transparent;
+  border: 2px solid #fff;
+  padding: 0.5rem 2rem;
+  cursor: pointer;
+}
+
+.btn-outline:hover{
+  background:radial-gradient(ellipse at 0.5rem 0.5rem, #e3ac46b5, transparent),
+  radial-gradient(ellipse at bottom, var(--color-primary), transparent);
+  border-color:var(--color-primary);
+  animation:none;
+}
+
+.text-primary-color{
+  color: var(--color-text);
+}
+
+.background-primary-color{
+  background: radial-gradient(#154C6888 0%,#151A20FF 100%);
+}
+
+.animation-flashing {
+  animation: flashing 2s ease infinite; /* 加上 infinite 保證動畫持續 */
+}
+
+@keyframes flashing {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
