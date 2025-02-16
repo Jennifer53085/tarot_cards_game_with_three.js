@@ -51,6 +51,7 @@ const PointerRaycaster = () => {
         switch (actionMode) {
             case ActionMode.SHUFFLE_CARDS:
             case ActionMode.START_SHUFFLE_CARDS:
+            case ActionMode.FINISH_SHUFFLE_CARDS:
                 {
                     const _handlePointerDown = (event: PointerEvent) => {
                         event.stopPropagation();
@@ -130,6 +131,7 @@ const PointerRaycaster = () => {
 
                 const _handleClick = (event: PointerEvent) => {
                     event.stopImmediatePropagation();
+                   
                     handlePointerPosition(event);
                     raycasterRef.current.setFromCamera(mouseVectorRef.current, camera);
                     raycasterRef.current.near = 0.1;  // 設定射線最小距離
@@ -159,7 +161,7 @@ const PointerRaycaster = () => {
             default:
                 break;
         }
-    }, [actionMode, camera, cardsObj, eventState]);
+    }, [actionMode, camera, cardsObj, eventState,eventDispatch,setFinishSuffleMode,setStartShuffleMode]);
     return null;
 }
 

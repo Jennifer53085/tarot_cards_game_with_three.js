@@ -6,6 +6,8 @@ import CameraController from '@app/components/controller/CameraController'; // �
 import TarotCard from '@app/components/threeModels/TarotCard';
 import { animationDuration, language, totalDrawCards } from '@app/utils/config'; // 顯示文字語系
 import { tarotCardsData } from '@app/data/tarotCardsData'; // 塔羅牌相關資料
+import { useCardsContext } from "@app/context/CardsContext";
+
 
 import { useGSAP } from '@gsap/react';
 import gsap from "gsap";
@@ -15,6 +17,7 @@ import gsap from "gsap";
 import { useActionModeContext } from '@app/context/ActionModeContext';
 
 const ResultContainer: React.FC = () => {
+    const { clearCards } = useCardsContext();//需要把原本的清空
     const { eventState, eventDispatch } = useEventContext();
     const { actionDispatch } = useActionModeContext();
     const resultArr = ["Past", "Now", "Future"];
@@ -44,7 +47,7 @@ const ResultContainer: React.FC = () => {
         }
 
         setCardInformation(_data);
-    }, [eventState.pickArr, showIndex])
+    }, [eventState, showIndex])
 
     //控制顯示卡片
     const pressAction = (action: string) => {
@@ -78,6 +81,7 @@ const ResultContainer: React.FC = () => {
     //重新抽牌
     const restart = () => {
         eventDispatch({ type: "SET_PICK_TARGET", payload: [] });
+        clearCards();
         actionDispatch({ type: "RESET_MODE" })
     }
 

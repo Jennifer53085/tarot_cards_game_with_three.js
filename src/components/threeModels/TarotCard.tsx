@@ -10,7 +10,7 @@ import { useEventContext } from "@app/context/EventContext";
 import { ActionMode } from "@app/enum/actionMode";
 import { useCardsContext } from "@app/context/CardsContext";
 import { tarotCardsData } from "@app/data/tarotCardsData";
-import { totalCards, totalDrawCards,animationDuration } from "@app/utils/config";
+import { totalCards, totalDrawCards, animationDuration } from "@app/utils/config";
 
 
 
@@ -118,19 +118,27 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
   //   shaderMaterialRef.current.needsUpdate = true;
   // }, [isHover]);
 
+  useEffect(() => {
+
+      if (cardsRef.current.indexOf(cardRef.current) === -1) {
+        addCard(cardRef.current);
+      }
+    
+  }, [cardsRef,addCard])
+
   //設置位置
   useEffect(() => {
     if (!cardRef.current) return;
     if (actionMode === ActionMode.READ_CARDS && eventState.pickArr.length === totalDrawCards) {
       setPosition(new THREE.Vector3(0, 0, 0));
       setRotation(new THREE.Euler(0, 0, isReverse ? Math.PI : 0)); // 逆位設定為 180 度
-
     } else {
+    console.log(cardRef.current)
       cardRef.current.userData.cardId = num;
       setPosition(cardRef.current.position);
       setRotation(cardRef.current.rotation);
     }
-  }, [position, rotation, num, eventState, actionMode, isReverse]);
+  }, [position, rotation, num, eventState, actionMode]);
 
   //動畫製作
   useGSAP(() => {
@@ -148,7 +156,7 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
         const _aniRotation = gsap.to(cardRef.current.rotation, {
           z: "+= 2 * Math.PI",
           repeat: -1,
-          duration: animationDuration*60,
+          duration: animationDuration * 60,
           ease: "none",
           yoyo: true,
         });
@@ -207,7 +215,7 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
           x: defaultPosition.x,
           y: defaultPosition.y + tableTop + shuffleOrder * cardsSpacing,
           z: defaultPosition.z,
-          duration: animationDuration/2,
+          duration: animationDuration / 2,
           ease: "power4.in",
         });
 
@@ -324,12 +332,12 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
                 x: planingCardPositions[index], // 根據索引設置位置
                 y: 1.5,                          // 設定高度
                 z: 0,
-                duration: animationDuration/3,                    // 動畫持續時間
+                duration: animationDuration / 3,                    // 動畫持續時間
               })
                 // 設置旋轉動畫
                 .to(cardRef.current.rotation, {
                   x: Math.PI, // 設定旋轉角度
-                  duration: animationDuration/6,
+                  duration: animationDuration / 6,
                   ease: "power4.in",
                 });
             }
@@ -351,9 +359,7 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
   });
 
 
-  if (cardsRef.current.indexOf(cardRef.current) === -1) {
-    addCard(cardRef.current);
-  }
+
 
   // const handlePointerEnter = () => {
   //   gl.domElement.style.cursor = 'pointer';

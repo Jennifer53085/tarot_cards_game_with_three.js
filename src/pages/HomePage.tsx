@@ -43,8 +43,6 @@ const HomePage = () => {
   const [isResult, setIsResult] = useState(false);
 
 
-
-
   //處理洗牌邏輯
   const getShuffleCardsOrder = useCallback(() => {
     if (Array.isArray(cardsRef.current) && cardsRef.current.length > 0) {
