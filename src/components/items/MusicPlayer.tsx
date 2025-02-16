@@ -9,7 +9,7 @@ interface MusicPlayerProps {
 
 const MusicPlayer: React.FC<MusicPlayerProps> = ({ style, className }) => {
     const [isPlaying, setIsPlaying] = useState(false);
-    const audio = useRef(new Audio(`${import.meta.env.BASE_URL}assets/music/mysterious-night.wav`));
+    const audio = useRef(new Audio(`${import.meta.env.BASE_URL}assets/music/mysterious-night.mp3`));
     const fadeInterval = useRef<number | undefined>(undefined);
     const duration = 30;
 
