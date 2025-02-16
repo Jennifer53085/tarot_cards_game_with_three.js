@@ -7,11 +7,11 @@ import { ActionMode } from "@app/enum/actionMode";
 import { useCardsContext } from "@app/context/CardsContext";
 import { useActionModeContext } from "@app/context/ActionModeContext";
 import { useEventContext } from "@app/context/EventContext";
-
+import { totalDrawCards } from "@app/utils/config";
 
 const PointerRaycaster = () => {
     const { actionMode, actionDispatch } = useActionModeContext();
-    const { eventDispatch,eventState } = useEventContext();
+    const { eventDispatch, eventState } = useEventContext();
     const { camera } = useThree();
     const { cardsRef } = useCardsContext();
     const raycasterRef = useRef(new THREE.Raycaster());
@@ -51,34 +51,36 @@ const PointerRaycaster = () => {
         switch (actionMode) {
             case ActionMode.SHUFFLE_CARDS:
             case ActionMode.START_SHUFFLE_CARDS:
-            case ActionMode.FINISH_SHUFFLE_CARDS: {
-                const _handlePointerDown = (event: PointerEvent) => {
-                    handlePointerPosition(event);
-                    raycasterRef.current.setFromCamera(mouseVectorRef.current, camera);
-                    const intersects = raycasterRef.current.intersectObjects(cardsObj);
-                    event.preventDefault();
-                    if (intersects.length > 0) {
-                        setStartShuffleMode();
-                    }
-                };
-                const _handlePointerUp = (event: PointerEvent) => {
-                    event.preventDefault();
-                    if (actionMode === ActionMode.START_SHUFFLE_CARDS) {
-                        setFinishSuffleMode();
-                    }
-                };
+                {
+                    const _handlePointerDown = (event: PointerEvent) => {
 
-                window.addEventListener("pointerdown", _handlePointerDown);
-                window.addEventListener("pointerup", _handlePointerUp);
+                        handlePointerPosition(event);
+                        raycasterRef.current.setFromCamera(mouseVectorRef.current, camera);
+                        const intersects = raycasterRef.current.intersectObjects(cardsObj);
+                        event.preventDefault();
+                        if (intersects.length > 0) {
+                            setStartShuffleMode();
+                        }
+                    };
+                    const _handlePointerUp = (event: PointerEvent) => {
+                        event.preventDefault();
+                        if (actionMode === ActionMode.START_SHUFFLE_CARDS) {
+                            setFinishSuffleMode();
+                        }
+                    };
 
-                return () => {
-                    window.removeEventListener("pointerdown", _handlePointerDown);
-                    window.removeEventListener("pointerup", _handlePointerUp);
-                };
-            }
+                    window.addEventListener("pointerdown", _handlePointerDown);
+                    window.addEventListener("pointerup", _handlePointerUp);
+
+                    return () => {
+                        window.removeEventListener("pointerdown", _handlePointerDown);
+                        window.removeEventListener("pointerup", _handlePointerUp);
+                    };
+                }
             case ActionMode.DRAW_CARDS:
             case ActionMode.START_DRAW_CARDS:
             case ActionMode.FINISH_DRAW_CARDS: {
+                //TODO做hover動畫
                 // const _handlePointerMove = (event: PointerEvent) => {
                 //     handlePointerPosition(event);
                 //     raycasterRef.current.setFromCamera(mouseVectorRef.current, camera);
@@ -125,35 +127,38 @@ const PointerRaycaster = () => {
                 // }
 
 
+                const _handleClick = (event: PointerEvent) => {
+                    event.stopImmediatePropagation();
+                    handlePointerPosition(event);
+                    raycasterRef.current.setFromCamera(mouseVectorRef.current, camera);
+                    raycasterRef.current.near = 0.1;  // 設定射線最小距離
+                    raycasterRef.current.far = 5;    // 設定射線最大距離
 
-                // const _handleClick = (event: PointerEvent) => {
-                //     event.stopPropagation();
-                //     handlePointerPosition(event);
-                //     raycasterRef.current.setFromCamera(mouseVectorRef.current, camera);
-                //     raycasterRef.current.near = 0.1;  // 設定射線最小距離
-                //     raycasterRef.current.far = 5;    // 設定射線最大距離
+                    const intersects = raycasterRef.current.intersectObjects(cardsObj);
 
-                //     const intersects = raycasterRef.current.intersectObjects(cardsObj);
-                //     if (intersects.length > 0) {
-                //         const clickTarget = intersects[0].object.userData;
-                //         console.log(clickTarget)
-                //         const addData = {cardId:clickTarget.cardId,isReverse:clickTarget.isReverse};
-                //         eventDispatch({type:"SET_PICK_TARGET",payload: [...eventState.pickArr, addData]})
-                //     }
-                // }
+                    if (intersects.length > 0 && eventState.pickArr.length < totalDrawCards) {
+                        const clickTarget = intersects[0].object.userData;
+
+                        const addData = { cardId: clickTarget.cardId, isReverse: clickTarget.isReverse };
+                        if (!eventState.pickArr.some(pickObj => pickObj.cardId === addData.cardId)
+                            || eventState.pickArr.length === 0) {
+                            eventDispatch({ type: "SET_PICK_TARGET", payload: [...new Set([...eventState.pickArr, addData])] })
+                        }
+                    }
+                }
                 // window.addEventListener("pointermove", _handlePointerMove);
-                // // window.addEventListener("pointerup", _handleClick);
-                // return () => {
-                //     window.removeEventListener("pointermove", _handlePointerMove);
-                //     // window.removeEventListener("pointerup", _handleClick);
-                // };
+                window.addEventListener("pointerup", _handleClick);
+                return () => {
+                    // window.removeEventListener("pointermove", _handlePointerMove);
+                    window.removeEventListener("pointerup", _handleClick);
+                };
 
             }
                 break;
             default:
                 break;
         }
-    }, [actionMode, camera, cardsObj, setStartShuffleMode, setFinishSuffleMode, cardsRef, eventDispatch,eventState]);
+    }, [actionMode, camera, cardsObj, eventState]);
     return null;
 }
 

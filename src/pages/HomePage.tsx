@@ -19,12 +19,14 @@ import { getNextMode } from '@app/utils/function';
 import PointerRaycaster from '@app/components/controller/PointerRaycaster';
 import { totalCards } from '@app/utils/config';
 
+import gsap from "gsap";
+import ResultContainer from '@app/components/items/ResultContainer';
+
 
 /*
 tips：three.js canvas記得加上useRef以避免重新渲染
 
 */
-
 //首頁
 const HomePage = () => {
   const TitleArr = webName.split(' ');
@@ -37,6 +39,10 @@ const HomePage = () => {
   const { cardsRef } = useCardsContext();
   const shuffleCountRef = useRef(0);
 
+  //結果處理
+  const [isResult, setIsResult] = useState(false);
+
+  //處理洗牌邏輯
   const getShuffleCardsOrder = useCallback(() => {
     if (Array.isArray(cardsRef.current) && cardsRef.current.length > 0) {
       const _shuffleArr = Array.from({ length: totalCards }, (_, index) => index);
@@ -59,19 +65,6 @@ const HomePage = () => {
 
   }, [cardsRef])
 
-  const handleNextStep = (event: React.MouseEvent<HTMLButtonElement> | React.TouchEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    switch (actionMode) {
-      case ActionMode.DEFAULT:
-        actionDispatch({ type: "SET_MODE", mode: getNextMode(ActionMode.DEFAULT) });
-        break;
-      case ActionMode.FINISH_SHUFFLE_CARDS:
-        actionDispatch({ type: "SET_MODE", mode: getNextMode(ActionMode.FINISH_SHUFFLE_CARDS) });
-        break;
-      default:
-        break;
-    }
-  };
 
   useEffect(() => {
     if (actionMode !== ActionMode.START_SHUFFLE_CARDS) return;
@@ -80,11 +73,12 @@ const HomePage = () => {
     getShuffleCardsOrder();//這裡做洗牌邏輯
   }, [actionMode, getShuffleCardsOrder]);
 
-
+  //控制洗牌過程
   useEffect(() => {
     switch (actionMode) {
       case ActionMode.DEFAULT:
         setBtnText("Reading Fortune");
+        setIsResult(false);
         break;
       case ActionMode.SHUFFLE_CARDS:
         setIsFlashing(true);
@@ -104,6 +98,9 @@ const HomePage = () => {
       case ActionMode.DRAW_CARDS:
         setBtnText("Pick 3 Cards to Continue");
         break;
+      case ActionMode.FINISH_DRAW_CARDS:
+        setBtnText("Reading result?");
+        break;
       default:
         setIsFlashing(false);
         setBtnText("");
@@ -111,12 +108,51 @@ const HomePage = () => {
     }
   }, [actionMode, shuffleCountRef]);
 
+  const handleNextStep = (event: React.PointerEvent<HTMLButtonElement>) => {
+    event.nativeEvent.stopImmediatePropagation();//stopImmediatePropagation可以避免同一個元件上的不同事件衝突
+    switch (actionMode) {
+      case ActionMode.DEFAULT:
+        actionDispatch({ type: "SET_MODE", mode: getNextMode(ActionMode.DEFAULT) });
+        break;
+      case ActionMode.FINISH_SHUFFLE_CARDS:
+        actionDispatch({ type: "SET_MODE", mode: getNextMode(ActionMode.FINISH_SHUFFLE_CARDS) });
+        break;
+      case ActionMode.FINISH_DRAW_CARDS:
+        {
+          gsap.to(canvasRef.current, {
+            opacity: 0,
+            duration: 1,
+            onComplete: () => {
+              setIsResult(true);
+              if (canvasRef.current) {
+                canvasRef.current.style.display = "none";
+              }
+              actionDispatch({ type: "SET_MODE", mode: getNextMode(ActionMode.FINISH_DRAW_CARDS) });
+            },
+          });
+
+          break;
+        }
+      default:
+        break;
+    }
+  };
+
+
+  //顯示結果頁面
+  useEffect(() => {
+    if (isResult) {
+      gsap.fromTo("main", { opacity: 0 }, { opacity: 1, duration: 1 });
+    }
+  }, [isResult]);
+
+
 
   return (
     <div className="w-screen h-screen background-primary-color">
       <TitleUpdater title={webName} />
       <header
-        className={`p-[2rem] w-full absolute font-black tracking-wider uppercase
+        className={`p-[2rem] w-full ${isResult ? "relative" : "absolute"} font-black tracking-wider uppercase
           flex flex-col justify-start sm:justify-center space-x-6
            transition-all duration-1000 ease-in-out transform
           ${actionMode === ActionMode.DEFAULT ?
@@ -127,7 +163,7 @@ const HomePage = () => {
         {TitleArr.map((title, i) => <span key={i} className="block md:inline">{title}</span>)}
       </header>
 
-      <Canvas ref={canvasRef} className='w-100 h-100' style={{ background: 'transparent' }}>
+      {!isResult && <Canvas ref={canvasRef} className='w-100 h-100' style={{ background: 'transparent' }}>
         {/* <OrbitControls
           enableRotate
           enableZoom
@@ -144,24 +180,27 @@ const HomePage = () => {
         <Table position={defaultObjPosition} />
         {
           Array.from({ length: totalCards }, (_, i) => {
-            return <TarotCard key={i} tablePosition={defaultObjPosition} num={tarotCardsData[i].cardId}/>;
+            return <TarotCard key={i} tablePosition={defaultObjPosition} num={tarotCardsData[i].cardId} />;
           })
         }
 
-      </Canvas>
-      <button
+      </Canvas>}
+
+      {!isResult && <button
         id="nextActionBtn"
         className={`
           absolute bottom-15 left-1/2 
           transform -translate-x-1/2 
           transition-opacity duration-500 
           ${(isFlashing) && "animation-flashing opacity-0"}
-          ${(actionMode === ActionMode.DEFAULT || actionMode === ActionMode.FINISH_SHUFFLE_CARDS) &&
+          ${(actionMode === ActionMode.DEFAULT || actionMode === ActionMode.FINISH_SHUFFLE_CARDS || actionMode === ActionMode.FINISH_DRAW_CARDS) &&
           "btn-outline text-2xl"
           }
           `}
-        onClick={handleNextStep}
-      >{btnText}</button>
+        onPointerUp={handleNextStep}
+      >{btnText}</button>}
+
+      {isResult && <ResultContainer />}
     </div>
   );
 }

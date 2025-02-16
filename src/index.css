@@ -30,7 +30,7 @@ body {
   line-height: var(--line-height);
   font-weight: var(--font-weight);
   color: var(--color);
-  background-color: var(--background-color);
+  overflow: hidden;
 }
 
 *[class^='btn']{
@@ -50,13 +50,26 @@ body {
   border: 2px solid #fff;
   padding: 0.5rem 2rem;
   cursor: pointer;
+  transition: all 0.5s ease;
 }
 
 .btn-outline:hover{
   background:radial-gradient(ellipse at 0.5rem 0.5rem, #e3ac46b5, transparent),
   radial-gradient(ellipse at bottom, var(--color-primary), transparent);
   border-color:var(--color-primary);
-  animation:none;
+}
+.btn-card-control{
+  background-color: transparent;
+  border: 2px solid #fff;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: all 0.5s ease;
+}
+
+.btn-card-control:hover{
+  background:radial-gradient(ellipse at 0.5rem 0.5rem, #e3ac46b5, transparent),
+  radial-gradient(ellipse at bottom, var(--color-secondary), transparent);
+  border-color:var(--color-primary);
 }
 
 .text-primary-color{
@@ -69,6 +82,10 @@ body {
 
 .animation-flashing {
   animation: flashing 2s ease infinite; /* 加上 infinite 保證動畫持續 */
+}
+
+.w-clamp-50vw{
+  width: clamp(300px, 50vw, 600px);
 }
 
 @keyframes flashing {

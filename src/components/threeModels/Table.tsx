@@ -17,6 +17,7 @@ import { useActionModeContext } from '../../context/ActionModeContext';
 import { ActionMode } from '@app/enum/actionMode';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import { animationDuration } from '@app/utils/config';
 
 const Table: React.FC<GroupProps> = () => {
   const tableRef = useRef<THREE.Mesh>(null!);
@@ -40,7 +41,7 @@ const Table: React.FC<GroupProps> = () => {
         animationRef.current= gsap.to(tableRef.current.rotation, {
           z: "-= 2 * Math.PI",
           repeat: -1,
-          duration: 60,
+          duration: animationDuration*60,
           ease: "none",
           yoyo: true
         });
@@ -50,11 +51,10 @@ const Table: React.FC<GroupProps> = () => {
         // 停止旋轉，平滑回歸 0
         animationRef.current = gsap.to(tableRef.current.rotation, {
           z: 0,
-          duration: 1,
+          duration: animationDuration,
           ease: "none",
         });
         break;
-
       default:
         break;
     }

@@ -4,24 +4,25 @@ import { MeshProps } from "@react-three/fiber";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import * as THREE from "three";
-import { useThree } from "@react-three/fiber";
 
 import { useActionModeContext } from "@app/context/ActionModeContext";
 import { useEventContext } from "@app/context/EventContext";
 import { ActionMode } from "@app/enum/actionMode";
 import { useCardsContext } from "@app/context/CardsContext";
 import { tarotCardsData } from "@app/data/tarotCardsData";
-import { totalCards } from "@app/utils/config";
+import { totalCards, totalDrawCards,animationDuration } from "@app/utils/config";
 
 
 
 interface CardProps extends MeshProps {
-  tablePosition: THREE.Vector3;
+  tablePosition?: THREE.Vector3;
   num?: number;
+  isReverse?: boolean;
 }
 
 
-const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0 }) => {
+const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) => {
+  const defaultPosition = tablePosition || new THREE.Vector3(0, 0, 0);
   const { actionMode, actionDispatch } = useActionModeContext();
   const { cardsRef, addCard } = useCardsContext();
   const { eventState } = useEventContext();
@@ -30,11 +31,11 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0 }) => {
   const back = useTexture(`${import.meta.env.BASE_URL}assets/texture/card_back.png`);
   const cardSize = { width: 4, height: 7, thickness: 0.1 };
 
-  const { camera } = useThree();
+
   //TODO找出桌子頂端的數值
   const tableTop = 0.2;
   const cardsSpacing = 0.015;
-  const [position, setPosition] = useState(new THREE.Vector3(tablePosition.x, num * cardsSpacing + tableTop + tablePosition.y, tablePosition.z))
+  const [position, setPosition] = useState(new THREE.Vector3(defaultPosition.x, num * cardsSpacing + tableTop + defaultPosition.y, defaultPosition.z))
   const [rotation, setRotation] = useState(new THREE.Euler(Math.PI / 2, 0, 0));
 
   const animationRef = useRef<gsap.core.Tween[]>([]);
@@ -117,28 +118,20 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0 }) => {
   //   shaderMaterialRef.current.needsUpdate = true;
   // }, [isHover]);
 
-  //取得相機資訊（卡片換位置要用）
-  useEffect(() => {
-    if (camera instanceof THREE.OrthographicCamera) {
-      const width = camera.right - camera.left; // 畫面範圍的寬度
-      const height = camera.top - camera.bottom; // 畫面範圍的高度
-
-      console.log('Width:', width, 'Height:', height);
-
-      // 計算左邊界，並加上偏移量
-      const offset = 0.5;
-      const leftBoundary = camera.left + (width * 0.1) + offset;
-      console.log('Left Boundary:', leftBoundary);
-    }
-  }, [camera]);
-
   //設置位置
   useEffect(() => {
     if (!cardRef.current) return;
-    cardRef.current.userData.cardId = num;
-    setPosition(cardRef.current.position);
-    setRotation(cardRef.current.rotation);
-  }, [position, rotation, num]);
+    if (actionMode === ActionMode.READ_CARDS && eventState.pickArr.length === totalDrawCards) {
+      setPosition(new THREE.Vector3(0, 0, 0));
+      setRotation(new THREE.Euler(0, 0, isReverse ? Math.PI : 0)); // 逆位設定為 180 度
+
+
+    } else {
+      cardRef.current.userData.cardId = num;
+      setPosition(cardRef.current.position);
+      setRotation(cardRef.current.rotation);
+    }
+  }, [position, rotation, num, eventState, actionMode, isReverse]);
 
   //動畫製作
   useGSAP(() => {
@@ -149,12 +142,14 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0 }) => {
     }
 
     switch (actionMode) {
+      case ActionMode.READ_CARDS:
+        break;
       case ActionMode.DEFAULT: {
         // 卡片緩慢旋轉
         const _aniRotation = gsap.to(cardRef.current.rotation, {
           z: "+= 2 * Math.PI",
           repeat: -1,
-          duration: 60,
+          duration: animationDuration*60,
           ease: "none",
           yoyo: true,
         });
@@ -163,11 +158,12 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0 }) => {
 
       }
 
+
       case ActionMode.SHUFFLE_CARDS: {
         // 停止旋轉，平滑回歸 0
         const _aniRotation = gsap.to(cardRef.current.rotation, {
           z: 0,
-          duration: 1,
+          duration: animationDuration,
           ease: "none",
         });
         animationRef.current.push(_aniRotation)
@@ -180,7 +176,7 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0 }) => {
         const _aniPosition = gsap.to(cardRef.current.position, {
           x: position.x + Math.random() * 1 - 0.5,
           z: position.z + Math.random() * 1 - 0.5,
-          duration: Math.random() * 2 + 0.5,
+          duration: animationDuration,
           ease: "none",
           stagger: 0.05,
           repeat: -1,
@@ -188,7 +184,7 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0 }) => {
         });
         const _aniRotation = gsap.to(cardRef.current.rotation, {
           z: rotation.z + Math.random() * Math.PI * 3,
-          duration: Math.random() * 2 + 0.5,
+          duration: animationDuration,
           ease: "back.inOut(1.7)",
           repeat: -1,
           yoyo: true
@@ -197,7 +193,6 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0 }) => {
         animationRef.current.push(_aniPosition, _aniRotation);
         break;
       }
-
       case ActionMode.FINISH_SHUFFLE_CARDS: {
 
         let shuffleOrder = num;
@@ -210,10 +205,10 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0 }) => {
 
 
         const _aniPosition = gsap.to(cardRef.current.position, {
-          x: tablePosition.x,
-          y: tablePosition.y + tableTop + shuffleOrder * cardsSpacing,
-          z: tablePosition.z,
-          duration: 0.5,
+          x: defaultPosition.x,
+          y: defaultPosition.y + tableTop + shuffleOrder * cardsSpacing,
+          z: defaultPosition.z,
+          duration: animationDuration/2,
           ease: "power4.in",
         });
 
@@ -242,17 +237,17 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0 }) => {
 
         if (shuffleOrder < rowCount) {
           _aniPosition = gsap.to(cardRef.current.position, {
-            x: tablePosition.x + shuffleOrder * horizontalPan - middleX, // 參考桌面座標
-            y: tablePosition.y + tableTop + shuffleOrder * cardsSpacing,
-            z: tablePosition.z,
+            x: defaultPosition.x + shuffleOrder * horizontalPan - middleX, // 參考桌面座標
+            y: defaultPosition.y + tableTop + shuffleOrder * cardsSpacing,
+            z: defaultPosition.z,
             duration: 0.1 + shuffleOrder * 0.05, // 統一動畫時間
             ease: "expo.inOut"
           });
         } else {
           _aniPosition = gsap.to(cardRef.current.position, {
-            x: tablePosition.x + (shuffleOrder - rowCount) * horizontalPan - middleX,
-            y: tablePosition.y + tableTop + shuffleOrder * cardsSpacing,
-            z: tablePosition.z + verticalPan,
+            x: defaultPosition.x + (shuffleOrder - rowCount) * horizontalPan - middleX,
+            y: defaultPosition.y + tableTop + shuffleOrder * cardsSpacing,
+            z: defaultPosition.z + verticalPan,
             duration: 0.1 + shuffleOrder * 0.05,
             ease: "expo.inOut",
             onComplete: () => {
@@ -268,87 +263,86 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0 }) => {
         break;
       }
       case ActionMode.START_DRAW_CARDS: {
-        console.log(123456)
-        //滑鼠滑過動畫
-        const hoverIndex = eventState.hoverTarget;
-        if (eventState.isHover && cardRef.current.userData.shuffleOrder === hoverIndex) {
-          // 使用 GSAP 動畫控制發光
-          const _anilighter = gsap.to(cardRef.current.material, {
-            emissiveIntensity: 0.1, // 設置發光強度
-            duration: 0.3, // 動畫持續時間
-          });
+        //TODO滑鼠滑過動畫
+        // const hoverIndex = eventState.hoverTarget;
+        // if (eventState.isHover && cardRef.current.userData.shuffleOrder === hoverIndex) {
+        //   // 使用 GSAP 動畫控制發光
+        //   const _anilighter = gsap.to(cardRef.current.material, {
+        //     emissiveIntensity: 0.1, // 設置發光強度
+        //     duration: 0.3, // 動畫持續時間
+        //   });
 
-          animationRef.current.push(_anilighter);
-        } else {
-          // 如果不再 hover，恢復原狀
-          const _anilighter = gsap.to(cardRef.current.material, {
+        //   animationRef.current.push(_anilighter);
+        // } else {
+        //   // 如果不再 hover，恢復原狀
+        //   const _anilighter = gsap.to(cardRef.current.material, {
 
-            emissiveIntensity: 0, // 恢復發光強度為 0
-            duration: 0.3, // 動畫持續時間
-          });
+        //     emissiveIntensity: 0, // 恢復發光強度為 0
+        //     duration: 0.3, // 動畫持續時間
+        //   });
 
-          animationRef.current.push(_anilighter);
-        }
-// console.log(eventState.pickArr)
-        // if (camera instanceof THREE.OrthographicCamera) {
-        //   console.log(123)
-        //   // 1️⃣ 計算可視範圍
-        //   const offset = 0.5; // 避免卡片貼到邊界
-        //   const frustumSize = camera.right - camera.left;
-
-        //   // 2️⃣ 計算「左、中、右」位置
-        //   const leftX = camera.left + frustumSize * 0.2 + offset;  // 左邊 20%
-        //   const centerX = (camera.left + camera.right) / 2;        // 正中央
-        //   const rightX = camera.right - frustumSize * 0.2 - offset; // 右邊 20%
-
-        //   // 3️⃣ 根據 index 設定卡片的目標 X 位置
-        //   const planingCardPositions:number[] = [leftX, centerX, rightX];
-
-
-
-        //   switch (eventState.pickArr.length) {
-        //     case 1: {
-        //       eventState.pickArr.forEach((clickItem, index) => {
-        //         if (cardRef.current.userData.cardId === clickItem.cardId) {
-
-        //           const _aniPosition = gsap.to(cardRef.current.position, {
-        //             x: planingCardPositions[0],
-        //             y:-1,
-        //             z:1,
-        //             duration: 0.3, // 動畫持續時間
-        //           });
-
-        //           const _aniRotation = gsap.to(cardRef.current.rotation, {
-        //             z:  Math.PI/4,//Math.PI是正位
-        //             duration: 0.5,
-        //             ease: "power4.in",
-        //           });
-          
-        //           animationRef.current.push(_aniPosition, _aniRotation);
-        //         }
-
-
-        //       })
-        //     }
-        //       break;
-        //     case 2:
-        //       break;
-        //     case 3: {
-        //       //點擊完之後要切換到下一個actionMode
-        //       actionDispatch({ type: "SET_MODE", mode: ActionMode.FINISH_DRAW_CARDS })
-        //     }
-        //       break;
-        //     default:
-        //       break;
-        //   }
-
+        //   animationRef.current.push(_anilighter);
         // }
+        // console.log(eventState.pickArr)
+        //處理選中邏輯
 
 
-      }
+
+        // 2. 計算左、中、右位置
+        const offset = 0.5 // 保持一定的邊界距離
+
+        const leftX = -offset;   // 左邊位置
+        const centerX = 0;      // 中央位置
+        const rightX = +offset;   // 右邊位置
+
+        // 根據 index 設定卡片的目標 X 位置
+        const planingCardPositions = [leftX, centerX, rightX];
+        if (eventState.pickArr.length > 0) {
+          const tl = gsap.timeline({
+            onComplete: () => {
+              // 所有動畫完成後，執行翻面動作
+              if (eventState.pickArr.length === totalDrawCards) {
+                eventState.pickArr.forEach((clickItem) => {
+                  if (cardRef.current.userData.cardId === clickItem.cardId) {
+                    // 單獨對每個選中的卡片進行翻面
+                    gsap.to(cardRef.current.rotation, {
+                      y: Math.PI,  // 翻轉 180 度
+                      duration: 0.5,
+                      ease: "power4.out",
+                      onComplete: () => {
+                        actionDispatch({ type: "SET_MODE", mode: ActionMode.FINISH_DRAW_CARDS })
+                      }
+                    });
+                  }
+                });
+              }
+            }
+          });
+
+          eventState.pickArr.forEach((clickItem, index) => {
+            if (cardRef.current.userData.cardId === clickItem.cardId) {
+              // 設置位置動畫
+              tl.to(cardRef.current.position, {
+                x: planingCardPositions[index], // 根據索引設置位置
+                y: 1.5,                          // 設定高度
+                z: 0,
+                duration: animationDuration/3,                    // 動畫持續時間
+              })
+                // 設置旋轉動畫
+                .to(cardRef.current.rotation, {
+                  x: Math.PI, // 設定旋轉角度
+                  duration: animationDuration/6,
+                  ease: "power4.in",
+                });
+            }
+          });
+
+
+        }
+
+
         break;
-
-
+      }
 
 
       default:
@@ -356,7 +350,7 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0 }) => {
     }
 
   }, {
-    dependencies: [actionMode, cardsRef],
+    dependencies: [actionMode, cardsRef, eventState.pickArr],
     revertOnUpdate: false
   });
 

@@ -64,7 +64,7 @@ const eventReducer = (state: EventState, action: EventAction): EventState => {
     case 'SET_HOVER_TARGET':
       return { ...state, hoverTarget: action.payload };
       case 'SET_PICK_TARGET':
-        return { ...state, pickArr: [...new Set([...state.pickArr, ...action.payload])] };    
+        return { ...state, pickArr: [...action.payload] };    
     default:
       return state;
   }
