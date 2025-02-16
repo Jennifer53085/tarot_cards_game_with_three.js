@@ -53,7 +53,7 @@ const PointerRaycaster = () => {
             case ActionMode.START_SHUFFLE_CARDS:
                 {
                     const _handlePointerDown = (event: PointerEvent) => {
-
+                        event.stopPropagation();
                         handlePointerPosition(event);
                         raycasterRef.current.setFromCamera(mouseVectorRef.current, camera);
                         const intersects = raycasterRef.current.intersectObjects(cardsObj);
@@ -64,6 +64,7 @@ const PointerRaycaster = () => {
                     };
                     const _handlePointerUp = (event: PointerEvent) => {
                         event.preventDefault();
+                        event.stopPropagation();
                         if (actionMode === ActionMode.START_SHUFFLE_CARDS) {
                             setFinishSuffleMode();
                         }
