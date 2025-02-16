@@ -42,6 +42,9 @@ const HomePage = () => {
   //結果處理
   const [isResult, setIsResult] = useState(false);
 
+
+
+
   //處理洗牌邏輯
   const getShuffleCardsOrder = useCallback(() => {
     if (Array.isArray(cardsRef.current) && cardsRef.current.length > 0) {
@@ -96,6 +99,7 @@ const HomePage = () => {
         }
         break;
       case ActionMode.DRAW_CARDS:
+      case ActionMode.START_DRAW_CARDS:
         setBtnText("Pick 3 Cards to Continue");
         break;
       case ActionMode.FINISH_DRAW_CARDS:

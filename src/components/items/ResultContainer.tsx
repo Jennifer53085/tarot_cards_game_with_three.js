@@ -254,7 +254,7 @@ const ResultContainer: React.FC = () => {
                     </Canvas>
                     <p className='h-[10vh] flex justify-center items-center p-5'>{cardInformation?.cardContent}</p>
                 </div>
-                <button className='btn-outline w-clamp-50vw h-[5vh] fixed bottom-[10vh] left-1/2 transform -translate-x-1/2'
+                <button className='btn-outline w-clamp-50vw h-[5vh] fixed bottom-[5vh] left-1/2 transform -translate-x-1/2'
                     onPointerUp={restart}> Restart?</button>
             </main>
             {/* 重抽按鈕 */}

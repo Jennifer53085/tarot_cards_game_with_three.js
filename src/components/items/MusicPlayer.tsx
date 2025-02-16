@@ -35,8 +35,8 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ style, className }) => {
         };
     }, [isPlaying]); // 只有當 isPlaying 改變時才會觸發
 
-    const togglePlay = (event: React.MouseEvent<HTMLButtonElement> | React.TouchEvent<HTMLButtonElement>) => {
-        event.stopPropagation();//限制事件影響範圍
+    const togglePlay = (event: React.PointerEvent<HTMLButtonElement>) => {
+        event.nativeEvent.stopImmediatePropagation()//限制事件影響範圍
         setIsPlaying((prev) => !prev);
     };
 
@@ -72,7 +72,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ style, className }) => {
 
     return (
         <div style={style} className={className}>
-            <button onClick={(event) => togglePlay(event)} className='btn-media'>
+            <button onPointerUp={(event) => togglePlay(event)} className='btn-media'>
                 <FontAwesomeIcon icon={isPlaying ? faVolumeHigh : faVolumeXmark} />
                 &nbsp;&nbsp;
                 <span>{isPlaying ? "On" : "Off"}</span>

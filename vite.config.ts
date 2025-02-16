@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/tarot_cards/",
+  base: "/tarot_cards_game_with_three.js/",//必須使用與repo一樣名稱才可以部署到github pages
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
@@ -12,3 +12,5 @@ export default defineConfig({
     }
   }
 })
+
+//出版的話必須要先build之後才可以deploy

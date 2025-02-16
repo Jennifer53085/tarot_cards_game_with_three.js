@@ -125,13 +125,12 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
       setPosition(new THREE.Vector3(0, 0, 0));
       setRotation(new THREE.Euler(0, 0, isReverse ? Math.PI : 0)); // 逆位設定為 180 度
 
-
     } else {
       cardRef.current.userData.cardId = num;
       setPosition(cardRef.current.position);
       setRotation(cardRef.current.rotation);
     }
-  }, [position, rotation, num, eventState, actionMode, isReverse]);
+  }, [position, rotation, num, eventState.pickArr, actionMode, isReverse]);
 
   //動畫製作
   useGSAP(() => {
@@ -223,7 +222,6 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
       }
       case ActionMode.DRAW_CARDS: {
         const horizontalPan = 0.2;
-        const verticalPan = 1;
         const rowCount = totalCards / 2;
         const middleX = (rowCount - 1) * horizontalPan * 0.5;
 
@@ -239,7 +237,7 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
           _aniPosition = gsap.to(cardRef.current.position, {
             x: defaultPosition.x + shuffleOrder * horizontalPan - middleX, // 參考桌面座標
             y: defaultPosition.y + tableTop + shuffleOrder * cardsSpacing,
-            z: defaultPosition.z,
+            z: defaultPosition.z + 0.05,
             duration: 0.1 + shuffleOrder * 0.05, // 統一動畫時間
             ease: "expo.inOut"
           });
@@ -247,7 +245,7 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
           _aniPosition = gsap.to(cardRef.current.position, {
             x: defaultPosition.x + (shuffleOrder - rowCount) * horizontalPan - middleX,
             y: defaultPosition.y + tableTop + shuffleOrder * cardsSpacing,
-            z: defaultPosition.z + verticalPan,
+            z: defaultPosition.z + 1.2,
             duration: 0.1 + shuffleOrder * 0.05,
             ease: "expo.inOut",
             onComplete: () => {
@@ -339,8 +337,6 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
 
 
         }
-
-
         break;
       }
 
