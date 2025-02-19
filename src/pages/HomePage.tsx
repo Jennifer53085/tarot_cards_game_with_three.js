@@ -23,6 +23,7 @@ import gsap from "gsap";
 import ResultContainer from '@app/components/items/ResultContainer';
 
 
+
 /*
 tips：three.js canvas記得加上useRef以避免重新渲染
 
@@ -203,6 +204,11 @@ const HomePage = () => {
       >{btnText}</button>}
 
       {isResult && <ResultContainer />}
+      <footer className='fixed bottom-[0.5rem] left-0 right-0 z-10 text-center text-white text-xs'>
+        Copyright&nbsp;&copy;
+        <span id="year"></span>&nbsp;
+        <a href="http://jennifer53085.infinityfreeapp.com/">Huang Tzu-Ning.</a>
+        All rights reserved.</footer>
     </div>
   );
 }

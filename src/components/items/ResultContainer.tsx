@@ -16,6 +16,9 @@ import gsap from "gsap";
 
 import { useActionModeContext } from '@app/context/ActionModeContext';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faArrowRight,faArrowLeft} from '@fortawesome/free-solid-svg-icons';
+
 const ResultContainer: React.FC = () => {
     const { clearCards } = useCardsContext();//需要把原本的清空
     const { eventState, eventDispatch } = useEventContext();
@@ -234,11 +237,19 @@ const ResultContainer: React.FC = () => {
             <main ref={resultContainerRef} className='w-[100vw] h-[70vh] overflow-hidden'>
                 {/* 卡片操作左右 */}
                 <div className='w-clamp-50vw h-[5vh] flex justify-between items-center mx-auto my-3'>
-                    <button className="btn-card-control" onPointerUp={() => pressAction("prev")}>Prev card</button>
+               
+                
+                    <button className="btn-card-control" onPointerUp={() => pressAction("prev")}>
+                    <FontAwesomeIcon icon={faArrowLeft} />
+                    &nbsp; Prev card
+                        </button>
                     <div className="px-2 text-2xl">{resultText}</div>
-                    <button className="btn-card-control" onPointerUp={() => pressAction("next")}>Next card</button>
+                    <button className="btn-card-control" onPointerUp={() => pressAction("next")}>
+                        Next card &nbsp;
+                    <FontAwesomeIcon icon={faArrowRight} />
+                        </button>
                 </div>
-                <div ref={cardContainerRef} className={`resultCard relative left-1/2 transform -translate-x-1/2 border-2 border-white w-clamp-50vw h-[55vh] flex flex-col justify-around items-center text-center`}>
+                <div ref={cardContainerRef} className={`resultCard relative left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-clamp-50vw h-[55vh] flex flex-col justify-around items-center text-center`}>
                     <div className='h-[10vh]'>
                         <h1 className='text-2xl h-[6vh] leading-[6vh]'>{cardInformation?.cardName}</h1>
                         <h2 className='text-xl h-[4vh] leading-[4vh]'>{cardInformation?.position}</h2>

@@ -60,7 +60,6 @@ body {
 }
 .btn-card-control{
   background-color: transparent;
-  border: 2px solid #fff;
   padding: 0.5rem 1rem;
   cursor: pointer;
   transition: all 0.5s ease;
@@ -69,7 +68,7 @@ body {
 .btn-card-control:hover{
   background:radial-gradient(ellipse at 0.5rem 0.5rem, #e3ac46b5, transparent),
   radial-gradient(ellipse at bottom, var(--color-secondary), transparent);
-  border-color:var(--color-primary);
+
 }
 
 .text-primary-color{

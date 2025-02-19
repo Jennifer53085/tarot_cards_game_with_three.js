@@ -14,6 +14,7 @@ import { totalCards, totalDrawCards, animationDuration } from "@app/utils/config
 
 
 
+
 interface CardProps extends MeshProps {
   tablePosition?: THREE.Vector3;
   num?: number;
@@ -133,7 +134,7 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
       setPosition(new THREE.Vector3(0, 0, 0));
       setRotation(new THREE.Euler(0, 0, isReverse ? Math.PI : 0)); // 逆位設定為 180 度
     } else {
-    console.log(cardRef.current)
+    // console.log(cardRef.current)
       cardRef.current.userData.cardId = num;
       setPosition(cardRef.current.position);
       setRotation(cardRef.current.rotation);

@@ -5,6 +5,7 @@ import { LoadingProvider } from './context/LoadingContext';
 import HomePage from './pages/HomePage';
 import MusicPlayer from './components/items/MusicPlayer';
 import { EventProvider } from './context/EventContext';
+import Loading from './components/items/Loading';
 
 const App = () => {
   return (
@@ -12,6 +13,7 @@ const App = () => {
       <ActionModeProvider>
         <CardProvider>
           <EventProvider>
+            <Loading/>
             <HomePage />
             <MusicPlayer className='fixed top-[2.5rem] sm:top-[1.5rem] right-[1rem] z-999' />
           </EventProvider>

@@ -1,8 +1,10 @@
-import React, { createContext, useState,useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 interface LoadingContextType {
   isLoading: boolean;
-  setLoading: (loading: boolean) => void;
+  setIsLoading: (loading: boolean) => void;
+  loadingProgress: string;
+  setLoadingProgress: (loadingProgress: string) => void;
 }
 
 const LoadingContext = createContext<LoadingContextType | undefined>(undefined);
@@ -17,10 +19,11 @@ export const useLoadingContext = () => {
 
 
 export const LoadingProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isLoading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState("");
 
   return (
-    <LoadingContext.Provider value={{ isLoading, setLoading }}>
+    <LoadingContext.Provider value={{ isLoading, setIsLoading, loadingProgress, setLoadingProgress }}>
       {children}
     </LoadingContext.Provider>
   );
