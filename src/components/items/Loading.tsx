@@ -41,7 +41,7 @@ const Loading = () => {
             totalProgress = Object.values(progressMap).reduce((sum, p) => sum + p, 0) / Object.keys(progressMap).length;
 
             setLoadingProgress(totalProgress.toFixed(2));//tofixed 2位小數，型別是string
-            if (totalProgress === 100) {
+            if (totalProgress >= 100) {
                 setIsLoading(false);
             }
         }
