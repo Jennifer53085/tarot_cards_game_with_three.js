@@ -216,9 +216,7 @@ const ResultContainer: React.FC = () => {
     //         type: "x",
     //         trigger: "main",
     //         onPress: (event) => {
-    //             console.log("123")
 
-    //             // console.log(event)
     //             event.target.startOffset = scrub.vars.offset;
     //         },
     //         onDrag: (event) => {
@@ -249,7 +247,7 @@ const ResultContainer: React.FC = () => {
                     <FontAwesomeIcon icon={faArrowRight} />
                         </button>
                 </div>
-                <div ref={cardContainerRef} className={`resultCard relative left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-clamp-50vw h-[55vh] flex flex-col justify-around items-center text-center`}>
+                <div ref={cardContainerRef} className={`resultCard relative left-1/2 transform -translate-x-1/2 w-clamp-50vw h-[55vh] flex flex-col justify-around items-center text-center`}>
                     <div className='h-[10vh]'>
                         <h1 className='text-2xl h-[6vh] leading-[6vh]'>{cardInformation?.cardName}</h1>
                         <h2 className='text-xl h-[4vh] leading-[4vh]'>{cardInformation?.position}</h2>

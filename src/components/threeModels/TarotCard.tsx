@@ -88,7 +88,6 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
   // useFrame(() => {
   //   const drawModes = [ActionMode.DRAW_CARDS, ActionMode.START_DRAW_CARDS, ActionMode.FINISH_DRAW_CARDS];
   //   if (shaderMaterialRef.current && drawModes.includes(actionMode)) {
-  //     console.log("qwe")
   //     shaderMaterialRef.current.needsUpdate = true; // 每幀更新
   //   }
   // });
@@ -96,7 +95,6 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
   //設定材質發亮（在useGSAP裡面沒有用）
   // useEffect(() => {
   //   if(!cardRef.current)return;
-  //   // console.log(cardRef.current)
   //   if (isHover) {
   //       gsap.to(shaderMaterialRef.current.uniforms.uIntensity, {
   //           value: 3, // 設置發光強度
@@ -134,12 +132,11 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
       setPosition(new THREE.Vector3(0, 0, 0));
       setRotation(new THREE.Euler(0, 0, isReverse ? Math.PI : 0)); // 逆位設定為 180 度
     } else {
-    // console.log(cardRef.current)
       cardRef.current.userData.cardId = num;
       setPosition(cardRef.current.position);
       setRotation(cardRef.current.rotation);
     }
-  }, [position, rotation, num, eventState, actionMode]);
+  }, [ num, eventState, actionMode,isReverse]);
 
   //動畫製作
   useGSAP(() => {
@@ -180,7 +177,6 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
       }
 
       case ActionMode.START_SHUFFLE_CARDS: {
-
         const _aniPosition = gsap.to(cardRef.current.position, {
           x: position.x + Math.random() * 1 - 0.5,
           z: position.z + Math.random() * 1 - 0.5,
@@ -290,7 +286,6 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
 
         //   animationRef.current.push(_anilighter);
         // }
-        // console.log(eventState.pickArr)
         //處理選中邏輯
 
 
@@ -364,9 +359,6 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
 
   // const handlePointerEnter = () => {
   //   gl.domElement.style.cursor = 'pointer';
-  //   // console.log({isHover})
-  //   // console.log(shaderMaterialRef.current.userData.order)
-  //   // console.log(e)
 
   //   // if(shaderMaterialRef.current.userData.shuffleOrder==hoverTarget){
   //   // if(isHover){

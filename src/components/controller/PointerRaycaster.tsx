@@ -47,7 +47,6 @@ const PointerRaycaster = () => {
 
 
     useEffect(() => {
-
         switch (actionMode) {
             case ActionMode.SHUFFLE_CARDS:
             case ActionMode.START_SHUFFLE_CARDS:
@@ -108,7 +107,6 @@ const PointerRaycaster = () => {
 
                 //         if (hoveredCard.userData?.shuffleOrder > -1) {
                 //             const hoverIndex = hoveredCard.userData.shuffleOrder;
-                //             // console.log(hoverIndex)
 
                 //             eventDispatch({ type: "SET_IS_HOVER", payload: true });
                 //             eventDispatch({ type: "SET_HOVER_TARGET", payload: hoverIndex });
@@ -131,11 +129,11 @@ const PointerRaycaster = () => {
 
                 const _handleClick = (event: PointerEvent) => {
                     event.stopImmediatePropagation();
-                   
+
                     handlePointerPosition(event);
                     raycasterRef.current.setFromCamera(mouseVectorRef.current, camera);
-                    raycasterRef.current.near = 0.1;  // 設定射線最小距離
-                    raycasterRef.current.far = 5;    // 設定射線最大距離
+                    raycasterRef.current.near = 0.01;  // 設定射線最小距離
+                    raycasterRef.current.far = 100;    // 設定射線最大距離
 
                     const intersects = raycasterRef.current.intersectObjects(cardsObj);
 
@@ -161,7 +159,7 @@ const PointerRaycaster = () => {
             default:
                 break;
         }
-    }, [actionMode, camera, cardsObj, eventState,eventDispatch,setFinishSuffleMode,setStartShuffleMode]);
+    }, [actionMode, camera, cardsObj, eventState, eventDispatch, setFinishSuffleMode, setStartShuffleMode]);
     return null;
 }
 

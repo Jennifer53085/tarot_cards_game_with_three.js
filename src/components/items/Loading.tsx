@@ -1,9 +1,13 @@
-import { useEffect } from "react";
+import { useEffect,useRef } from "react";
 import { totalCards } from '@app/utils/config';
 import { useLoadingContext } from "@app/context/LoadingContext";
+import gsap from "gsap";
 
+// TODO
 const Loading = () => {
     const { isLoading, setIsLoading, loadingProgress, setLoadingProgress } = useLoadingContext();
+    const loadingRef = useRef<HTMLDivElement>(null);
+    
     // 下載資源並監測載入進度
     const loadAssetWithProgress = async (url: string, onProgress: (progress: number) => void): Promise<string> => {
         const response = await fetch(url);
@@ -42,14 +46,18 @@ const Loading = () => {
 
             setLoadingProgress(totalProgress.toFixed(2));//tofixed 2位小數，型別是string
             if (totalProgress >= 100) {
-                setIsLoading(false);
+                gsap.to(loadingRef.current, {
+                    opacity: 0,
+                    duration: 0.5,
+                    onComplete: () => setIsLoading(false), // 淡出完才關閉
+                  });
             }
         }
 
         const assets = [
-            { url: `${import.meta.env.BASE_URL}/models/forturntable.glb`, name: "table" },
-            { url: `${import.meta.env.BASE_URL}/music/mysterious-night.mp3`, name: "music" },
-            { url: `${import.meta.env.BASE_URL}/texture/card_back.png`, name: "backCard" },
+            { url: `${import.meta.env.BASE_URL}assets/models/forturntable.glb`, name: "table" },
+            { url: `${import.meta.env.BASE_URL}assets/music/mysterious-night.mp3`, name: "music" },
+            { url: `${import.meta.env.BASE_URL}assets/texture/card_back.png`, name: "backCard" },
             ...Array.from({ length: totalCards }, (_, i) => ({ url: `${import.meta.env.BASE_URL}/texture/card${i}.png`, name: `frontCard` })),
         ];
 
@@ -67,7 +75,7 @@ const Loading = () => {
     
 
     return (isLoading ?
-         <div className="loading w-full h-full fixed top-0 left-0 flex justify-center items-center bg-black bg-opacity-80 backdrop-blur-2xl z-50">
+         <div ref={loadingRef} className={`loading w-full h-full fixed top-0 left-0 flex justify-center items-center bg-black bg-opacity-80 backdrop-blur-2xl z-50`}>
             Loading...{loadingProgress}%</div> 
             : null);
 };
