@@ -8,7 +8,7 @@ const Loading = () => {
     const { isLoading, setIsLoading, loadingProgress, setLoadingProgress } = useLoadingContext();
     const loadingRef = useRef<HTMLDivElement>(null);
     const loadingTxtRef = useRef<HTMLSpanElement>(null);
-    const progressMap:Record<string, number> = {};
+    const progressMap: Record<string, number> = {};
     const assets = [
         { url: `${import.meta.env.BASE_URL}assets/models/forturntable.glb`, name: "table" },
         { url: `${import.meta.env.BASE_URL}assets/music/mysterious-night.mp3`, name: "music" },
@@ -43,10 +43,10 @@ const Loading = () => {
         return URL.createObjectURL(blob);
     };
 
-    const updateTotalProgress = (asset:string, totalAsset:number, progress:number) => {
+    const updateTotalProgress = (asset: string, totalAsset: number, progress: number) => {
         progressMap[asset] = progress === 100 ? 100 : progress;
         const totalProgress = Object.values(progressMap).reduce((sum, cur) => sum + cur, 0) / totalAsset;
-        setLoadingProgress(totalProgress.toFixed(2));
+        setLoadingProgress(Math.min(totalProgress, 100).toFixed(2));
 
         if (loadingTxtRef.current && totalProgress < 100) {
             gsap.fromTo(loadingTxtRef.current, { opacity: 1 }, { opacity: 0, duration: 0.5, repeat: -1, yoyo: true, ease: "power1.inOut" });
