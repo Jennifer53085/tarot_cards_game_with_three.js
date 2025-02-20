@@ -46,35 +46,57 @@ const Loading = () => {
             if (!(asset in progressMap)) {
                 progressMap[asset] = 0;
             }
+
             //每個的進度條
-            progressMap[asset] = progress/ totalAsset;
-            totalProgress = Object.values(progressMap).reduce((sum, current) => sum + current, 0);
-            console.log(progressMap);
-            console.log(totalProgress.toFixed(2));
-            setLoadingProgress(Math.min(totalProgress, 100).toFixed(2));//tofixed 2位小數，型別是string
+            progressMap[asset] = progress;
+            setLoadingProgress(progress.toFixed(2));//tofixed 2位小數，型別是string
+            totalProgress = Object.values(progressMap).reduce((sum, current) => sum + current, 0)/totalAsset;
+            // console.log(progressMap);
+            // console.log(totalProgress.toFixed(2));
 
-            if (totalProgress < 100) {
-                if (loadingTxtRef.current) {
-                    gsap.fromTo(loadingTxtRef.current, {
-                        opacity: 1
-                    }, {
-                        opacity: 1,
-                        duration: 0.5,
-                        repeat: -1,
-                        yoyo: true,
-                        ease: "power1.inOut",
-                    }
-                    );
-                }
+            // if (totalProgress < 100) {
+            //     if (loadingTxtRef.current) {
+            //         gsap.fromTo(loadingTxtRef.current, {
+            //             opacity: 1
+            //         }, {
+            //             opacity: 0.5,
+            //             duration: 0.5,
+            //             repeat: -1,
+            //             yoyo: true,
+            //             ease: "power1.inOut",
+            //         }
+            //         );
+            //     }
 
-            } else {
-                if (loadingRef.current) {
-                    gsap.to(loadingRef.current, {
-                        opacity: 0,
-                        duration: 1.5,
-                        onComplete: () => setIsLoading(false), // 淡出完才關閉
-                    });
+            // } else {
+            //     if (loadingRef.current) {
+            //         gsap.to(loadingRef.current, {
+            //             opacity: 0,
+            //             duration: 1.5,
+            //             onComplete: () => setIsLoading(false), // 淡出完才關閉
+            //         });
+            //     }
+            // }
+            const loadingMapKey = Object.keys(progressMap);
+            if (loadingTxtRef.current && totalProgress < 100) {
+                gsap.fromTo(loadingTxtRef.current, {
+                    opacity: 1
+                }, {
+                    opacity: 0.5,
+                    duration: 0.5,
+                    repeat: -1,
+                    yoyo: true,
+                    ease: "power1.inOut",
                 }
+                );
+            }
+
+            if (loadingMapKey.length === totalAsset && loadingRef.current) {
+                gsap.to(loadingRef.current, {
+                    opacity: 0,
+                    duration: 1.5,
+                    onComplete: () => setIsLoading(false), // 淡出完才關閉
+                });
             }
         }
 
