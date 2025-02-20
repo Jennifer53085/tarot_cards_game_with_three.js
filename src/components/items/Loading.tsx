@@ -8,20 +8,27 @@ const Loading = () => {
     const { isLoading, setIsLoading, loadingProgress, setLoadingProgress } = useLoadingContext();
     const loadingRef = useRef<HTMLDivElement>(null);
     const loadingTxtRef = useRef<HTMLSpanElement>(null);
+    const progressMap:Record<string, number> = {};
+    const assets = [
+        { url: `${import.meta.env.BASE_URL}assets/models/forturntable.glb`, name: "table" },
+        { url: `${import.meta.env.BASE_URL}assets/music/mysterious-night.mp3`, name: "music" },
+        { url: `${import.meta.env.BASE_URL}assets/texture/card_back.png`, name: "backCard" },
+        ...Array.from({ length: totalCards }, (_, i) => ({ url: `${import.meta.env.BASE_URL}assets/texture/card${i}.png`, name: `frontCard${i}` })),
+    ];
 
     // 下載資源並監測載入進度
     const loadAssetWithProgress = async (url: string, onProgress: (progress: number) => void): Promise<string> => {
-        const response = await fetch(url);
-        const total = Number(response.headers.get("Content-Length")) || 1; // 確保 total 為數字，避免 NaN(單個檔案種長度)
+        const cacheBuster = `?nocache=${Date.now()}`;
+        const response = await fetch(url + cacheBuster, { cache: "no-store" });
+        const total = Number(response.headers.get("Content-Length")) || 1;
         let loaded = 0;
 
-        if (!response.body) return URL.createObjectURL(await response.blob()); // 若無法獲取長度，則直接載入
+        if (!response.body) return URL.createObjectURL(await response.blob());
 
         const reader = response.body.getReader();
         const chunks: Uint8Array[] = [];
 
-        // 讀取數據並更新進度
-        async function processChunk(): Promise<Blob> {
+        async function processChunk() {
             const { done, value } = await reader.read();
             if (done) return new Blob(chunks);
 
@@ -36,99 +43,40 @@ const Loading = () => {
         return URL.createObjectURL(blob);
     };
 
-    // 加載所有資源
-    const loadAllAssets = async () => {
-        const progressMap: Record<string, number> = {};
-        let totalProgress = 0;
+    const updateTotalProgress = (asset:string, totalAsset:number, progress:number) => {
+        progressMap[asset] = progress === 100 ? 100 : progress;
+        const totalProgress = Object.values(progressMap).reduce((sum, cur) => sum + cur, 0) / totalAsset;
+        setLoadingProgress(totalProgress.toFixed(2));
 
-        function updateTotalProgress(asset: string, totalAsset: number, progress: number) {
-
-            if (!(asset in progressMap)) {
-                progressMap[asset] = 0;
-            }
-
-            //每個的進度條
-            progressMap[asset] = progress;
-            setLoadingProgress(progress.toFixed(2));//tofixed 2位小數，型別是string
-            totalProgress = Object.values(progressMap).reduce((sum, current) => sum + current, 0) / totalAsset;
-            //     console.log(progressMap);
-            //  console.log(totalProgress)
-
-            // if (totalProgress < 100) {
-            //     if (loadingTxtRef.current) {
-            //         gsap.fromTo(loadingTxtRef.current, {
-            //             opacity: 1
-            //         }, {
-            //             opacity: 0.5,
-            //             duration: 0.5,
-            //             repeat: -1,
-            //             yoyo: true,
-            //             ease: "power1.inOut",
-            //         }
-            //         );
-            //     }
-
-            // } else {
-            //     if (loadingRef.current) {
-            //         gsap.to(loadingRef.current, {
-            //             opacity: 0,
-            //             duration: 1.5,
-            //             onComplete: () => setIsLoading(false), // 淡出完才關閉
-            //         });
-            //     }
-            // }
-            const loadingMapKey = Object.keys(progressMap);
-            if (loadingTxtRef.current && totalProgress < 100) {
-                gsap.fromTo(loadingTxtRef.current, {
-                    opacity: 1
-                }, {
-                    opacity: 0.5,
-                    duration: 0.5,
-                    repeat: -1,
-                    yoyo: true,
-                    ease: "power1.inOut",
-                }
-                );
-            }
-
-            if (loadingMapKey.length === totalAsset && totalProgress >= 100 && loadingRef.current) {
-                gsap.to(loadingRef.current, {
-                    opacity: 0,
-                    duration: 1.5,
-                    onComplete: () => setIsLoading(false), // 淡出完才關閉
-                });
-            }
+        if (loadingTxtRef.current && totalProgress < 100) {
+            gsap.fromTo(loadingTxtRef.current, { opacity: 1 }, { opacity: 0, duration: 0.5, repeat: -1, yoyo: true, ease: "power1.inOut" });
         }
 
-        const assets = [
-            { url: `${import.meta.env.BASE_URL}assets/models/forturntable.glb`, name: "table" },
-            { url: `${import.meta.env.BASE_URL}assets/music/mysterious-night.mp3`, name: "music" },
-            { url: `${import.meta.env.BASE_URL}assets/texture/card_back.png`, name: "backCard" },
-            ...Array.from({ length: totalCards }, (_, i) => ({ url: `${import.meta.env.BASE_URL}assets/texture/card${i}.png`, name: `frontCard${i}` })),
-        ];
+        if (Object.keys(progressMap).length === totalAsset && totalProgress >= 100 && loadingRef.current) {
+            setTimeout(() => {
+                gsap.to(loadingRef.current, { opacity: 0, duration: 1.5, onComplete: () => setIsLoading(false) });
+            }, 500);
+        }
+    };
 
-
-
-        const promises = assets.map(asset =>
-            loadAssetWithProgress(asset.url, progress => updateTotalProgress(asset.name, assets.length, progress))
-        );
-
+    const loadAllAssets = async () => {
+        const promises = assets.map(asset => loadAssetWithProgress(asset.url, progress => updateTotalProgress(asset.name, assets.length, progress)));
         await Promise.all(promises);
     };
 
-    // 在組件掛載時執行資源加載
     useEffect(() => {
-        if (isLoading) {
+        if (isLoading && parseFloat(loadingProgress) < 100) {
             loadAllAssets();
         }
     }, [isLoading]);
 
-
-    return (isLoading ?
-        <div ref={loadingRef} className={`loading w-full h-full fixed top-0 left-0 flex justify-center items-center bg-black bg-opacity-80 backdrop-blur-2xl z-50`}>
-            <span ref={loadingTxtRef}>Loading...{loadingProgress}%</span>
-        </div>
-        : null);
+    return (
+        isLoading ? (
+            <div ref={loadingRef} className="loading w-full h-full fixed top-0 left-0 flex justify-center items-center bg-black bg-opacity-80 backdrop-blur-2xl z-50">
+                <span ref={loadingTxtRef}>Loading...{loadingProgress}%</span>
+            </div>
+        ) : null
+    );
 };
 
 export default Loading;
