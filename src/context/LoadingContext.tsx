@@ -4,8 +4,9 @@ interface LoadingContextType {
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
   loadingProgress: string;
-  setLoadingProgress: (loadingProgress: string) => void;
+  setLoadingProgress: (loadingProgress: string | ((prev: string) => string)) => void;  // 允許回調函數
 }
+
 
 const LoadingContext = createContext<LoadingContextType | undefined>(undefined);
 

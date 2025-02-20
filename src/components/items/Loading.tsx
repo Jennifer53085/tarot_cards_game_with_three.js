@@ -9,7 +9,7 @@
 //     const loadingRef = useRef<HTMLDivElement>(null);
 //     const loadingTxtRef = useRef<HTMLSpanElement>(null);
 //     const [progressMap, setProgressMap] = useState<Record<string, number>>({});
-    
+
 //     const assets = [
 //         { url: `${import.meta.env.BASE_URL}assets/models/forturntable.glb`, name: "table" },
 //         { url: `${import.meta.env.BASE_URL}assets/music/mysterious-night.mp3`, name: "music" },
@@ -100,7 +100,7 @@ const Loading = () => {
     const { isLoading, setIsLoading, loadingProgress, setLoadingProgress } = useLoadingContext();
     const loadingRef = useRef<HTMLDivElement>(null);
     const loadingTxtRef = useRef<HTMLSpanElement>(null);
-    
+
     const [progressMap, setProgressMap] = useState<Record<string, number>>({});
 
     //只建立一次就好
@@ -110,15 +110,15 @@ const Loading = () => {
         { url: `${import.meta.env.BASE_URL}assets/music/mysterious-night.mp3`, name: "music" },
         { url: `${import.meta.env.BASE_URL}assets/models/forturntable.glb`, name: "table" },
     ]), []);
-    
+
 
     // 計算總進度 (使用 useMemo 避免不必要的計算)
     const totalProgress = useMemo(() => {
         if (Object.keys(progressMap).length === 0) return 0;
         return Object.values(progressMap).reduce((sum, cur) => sum + cur, 0) / assets.length;
-    }, [progressMap,assets.length]);
-   
-  
+    }, [progressMap, assets.length]);
+
+
     // 下載資源並監測載入進度
     const loadAssetWithProgress = async (url: string, onProgress: (progress: number) => void): Promise<string> => {
         const cacheBuster = `?nocache=${Date.now()}`;
@@ -138,7 +138,7 @@ const Loading = () => {
             chunks.push(value);
             loaded += value.length;
             onProgress((loaded / total) * 100);
-            
+
 
             return processChunk();
         }
@@ -153,13 +153,13 @@ const Loading = () => {
             ...prev,
             [asset]: progress === 100 ? 100 : progress
         }));
-       
+
     };
 
     useEffect(() => {
         if (isLoading) {
             setProgressMap({}); // 清空進度
-            const promises = assets.map(asset => 
+            const promises = assets.map(asset =>
                 loadAssetWithProgress(asset.url, progress => updateTotalProgress(asset.name, progress))
             );
             Promise.all(promises).then(() => {
@@ -168,8 +168,8 @@ const Loading = () => {
                 }, 500);
             });
         }
-        
-    }, [isLoading]); 
+
+    }, [isLoading]);
 
     useEffect(() => {
         setLoadingProgress(Math.min(totalProgress, 100).toFixed(2));
@@ -177,6 +177,22 @@ const Loading = () => {
             gsap.fromTo(loadingTxtRef.current, { opacity: 1 }, { opacity: 1, duration: 0.5, repeat: -1, yoyo: true, ease: "power1.inOut" });
         }
     }, [totalProgress]);
+useEffect(() => {
+    if(isLoading){
+     //製作假進度（ui體驗較佳）
+     const fakeInterval = setInterval(() => {
+        if (parseFloat(loadingProgress) < 100) {
+            setLoadingProgress((prev: string) => {
+                const newProgress = Math.min(Number(prev) + Math.random() * 10, 100);
+                return newProgress.toFixed(2);
+            });
+        }
+    }, 300);
+    return () => clearInterval(fakeInterval);
+    }
+}, [isLoading]);
+
+
 
     return (
         isLoading ? (
