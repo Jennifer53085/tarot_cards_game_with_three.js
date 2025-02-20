@@ -50,9 +50,9 @@ const Loading = () => {
             //每個的進度條
             progressMap[asset] = progress;
             setLoadingProgress(progress.toFixed(2));//tofixed 2位小數，型別是string
-            totalProgress = Object.values(progressMap).reduce((sum, current) => sum + current, 0)/totalAsset;
-            // console.log(progressMap);
-            // console.log(totalProgress.toFixed(2));
+            totalProgress = Object.values(progressMap).reduce((sum, current) => sum + current, 0) / totalAsset;
+            //     console.log(progressMap);
+            //  console.log(totalProgress)
 
             // if (totalProgress < 100) {
             //     if (loadingTxtRef.current) {
@@ -91,7 +91,7 @@ const Loading = () => {
                 );
             }
 
-            if (loadingMapKey.length === totalAsset && loadingRef.current) {
+            if (loadingMapKey.length === totalAsset && totalProgress >= 100 && loadingRef.current) {
                 gsap.to(loadingRef.current, {
                     opacity: 0,
                     duration: 1.5,
