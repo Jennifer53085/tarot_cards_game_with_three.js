@@ -43,7 +43,6 @@ const Loading = () => {
         function updateTotalProgress(asset: string, progress: number) {
             progressMap[asset] = progress;
             totalProgress = Object.values(progressMap).reduce((sum, p) => sum + p, 0) / Object.keys(progressMap).length;
-
             setLoadingProgress(totalProgress.toFixed(2));//tofixed 2位小數，型別是string
             if (totalProgress >= 100) {
                 gsap.to(loadingRef.current, {
@@ -70,10 +69,10 @@ const Loading = () => {
 
     // 在組件掛載時執行資源加載
     useEffect(() => {
-        if (isLoading) {
+        if (isLoading && parseFloat(loadingProgress) < 100) {
             loadAllAssets();
         }
-    }, [isLoading]);
+    }, [isLoading,loadingProgress]);
 
 
     return (isLoading ?

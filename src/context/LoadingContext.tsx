@@ -20,7 +20,7 @@ export const useLoadingContext = () => {
 
 export const LoadingProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [loadingProgress, setLoadingProgress] = useState("");
+  const [loadingProgress, setLoadingProgress] = useState("0");
 
   return (
     <LoadingContext.Provider value={{ isLoading, setIsLoading, loadingProgress, setLoadingProgress }}>
