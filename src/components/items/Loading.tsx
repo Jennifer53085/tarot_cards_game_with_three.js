@@ -9,6 +9,7 @@ const Loading = () => {
     const loadingRef = useRef<HTMLDivElement>(null);
     const loadingTxtRef = useRef<HTMLSpanElement>(null);
     const [progressMap, setProgressMap] = useState<Record<string, number>>({});
+    const [fakeProgress, setFakeProgress] = useState(0);
 
     // 確保 `assets` 陣列不會在重新渲染時變更
     const assets = useMemo(() => ([
@@ -70,10 +71,18 @@ const Loading = () => {
                     });
                 }, 500);
             });
+            
+            //設置假進度
+            const fakeProgressInterval = setInterval(() => {
+                setFakeProgress(prev => Math.min(prev + 0.5, 95));
+            }
+            , 500);
+            return () => clearInterval(fakeProgressInterval);
         }
     }, [isLoading]);
 
     useEffect(() => {
+        console.log(totalProgress)
         setLoadingProgress(Math.min(totalProgress, 100).toFixed(2));
         if (loadingTxtRef.current && totalProgress < 100) {
             gsap.fromTo(loadingTxtRef.current, { opacity: 1 }, { opacity: 0, duration: 0.5, repeat: -1, yoyo: true, ease: "power1.inOut" });
@@ -82,7 +91,7 @@ const Loading = () => {
 
     return isLoading ? (
         <div ref={loadingRef} className="loading w-full h-full fixed top-0 left-0 flex justify-center items-center bg-black bg-opacity-80 backdrop-blur-2xl z-50">
-            <span ref={loadingTxtRef}>Loading...{loadingProgress}%</span>
+            <span ref={loadingTxtRef}>Loading...{loadingProgress==="0"?fakeProgress:loadingProgress}%</span>
         </div>
     ) : null;
 };
