@@ -58,7 +58,7 @@ const Loading = () => {
             { url: `${import.meta.env.BASE_URL}assets/models/forturntable.glb`, name: "table" },
             { url: `${import.meta.env.BASE_URL}assets/music/mysterious-night.mp3`, name: "music" },
             { url: `${import.meta.env.BASE_URL}assets/texture/card_back.png`, name: "backCard" },
-            ...Array.from({ length: totalCards }, (_, i) => ({ url: `${import.meta.env.BASE_URL}/texture/card${i}.png`, name: `frontCard` })),
+            ...Array.from({ length: totalCards }, (_, i) => ({ url: `${import.meta.env.BASE_URL}assets/texture/card${i}.png`, name: `frontCard` })),
         ];
 
         const promises = assets.map(asset =>
