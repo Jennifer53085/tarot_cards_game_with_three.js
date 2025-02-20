@@ -101,14 +101,13 @@ const Loading = () => {
     const loadingRef = useRef<HTMLDivElement>(null);
     const loadingTxtRef = useRef<HTMLSpanElement>(null);
     
-    // 用 useState 管理進度
     const [progressMap, setProgressMap] = useState<Record<string, number>>({});
 
     const assets = [
-        { url: `${import.meta.env.BASE_URL}assets/models/forturntable.glb`, name: "table" },
-        { url: `${import.meta.env.BASE_URL}assets/music/mysterious-night.mp3`, name: "music" },
         { url: `${import.meta.env.BASE_URL}assets/texture/card_back.png`, name: "backCard" },
         ...Array.from({ length: totalCards }, (_, i) => ({ url: `${import.meta.env.BASE_URL}assets/texture/card${i}.png`, name: `frontCard${i}` })),
+        { url: `${import.meta.env.BASE_URL}assets/music/mysterious-night.mp3`, name: "music" },
+        { url: `${import.meta.env.BASE_URL}assets/models/forturntable.glb`, name: "table" },
     ];
 
     // 計算總進度 (使用 useMemo 避免不必要的計算)

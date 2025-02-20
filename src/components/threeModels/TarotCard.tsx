@@ -147,8 +147,7 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
     }
 
     switch (actionMode) {
-      case ActionMode.READ_CARDS:
-        break;
+    
       case ActionMode.DEFAULT: {
         // 卡片緩慢旋轉
         const _aniRotation = gsap.to(cardRef.current.rotation, {
@@ -328,7 +327,7 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
                 x: planingCardPositions[index], // 根據索引設置位置
                 y: 1.5,                          // 設定高度
                 z: 0,
-                duration: animationDuration / 3,                    // 動畫持續時間
+                duration: animationDuration / 3,  // 動畫持續時間
               })
                 // 設置旋轉動畫
                 .to(cardRef.current.rotation, {
@@ -343,8 +342,19 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
         }
         break;
       }
+      case ActionMode.READ_CARDS: {
+        // 卡片緩慢旋轉
+        const _aniRotation = gsap.to(cardRef.current.rotation, {
+          y: "+= 2 * Math.PI",
+          repeat: -1,
+          duration: animationDuration *10,
+          ease: "none",
+          yoyo: true,
+        });
+        animationRef.current.push(_aniRotation);
+        break;
 
-
+      }
       default:
         break;
     }

@@ -237,12 +237,12 @@ const ResultContainer: React.FC = () => {
                 <div className='w-clamp-50vw h-[5vh] flex justify-between items-center mx-auto my-3'>
                
                 
-                    <button className="btn-card-control" onPointerUp={() => pressAction("prev")}>
+                    <button className="btn-card-control text-xs" onPointerUp={() => pressAction("prev")}>
                     <FontAwesomeIcon icon={faArrowLeft} />
                     &nbsp; Prev card
                         </button>
-                    <div className="px-2 text-2xl">{resultText}</div>
-                    <button className="btn-card-control" onPointerUp={() => pressAction("next")}>
+                    <div className="text-2xl">{resultText}</div>
+                    <button className="btn-card-control text-xs" onPointerUp={() => pressAction("next")}>
                         Next card &nbsp;
                     <FontAwesomeIcon icon={faArrowRight} />
                         </button>

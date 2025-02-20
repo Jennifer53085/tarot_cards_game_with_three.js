@@ -60,9 +60,9 @@ body {
 }
 .btn-card-control{
   background-color: transparent;
-  padding: 0.5rem 1rem;
+  padding: 0.25rem 0.5rem;
   white-space: nowrap;
-  width: clamp(fit-content,15vw,20rem);
+  width: clamp(fit-content,15vw,10rem);
   cursor: pointer;
   transition: all 0.5s ease;
 }
