@@ -344,13 +344,17 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
       }
       case ActionMode.READ_CARDS: {
         // 卡片緩慢旋轉
-        const _aniRotation = gsap.to(cardRef.current.rotation, {
+        const _aniRotation = gsap.fromTo(cardRef.current.rotation, 
+          {
+          y:-Math.PI/4,
+        },{
           y: "+= 120 * Math.PI",
           repeat: -1,
-          duration: animationDuration *120,
+          duration: animationDuration *360,
           ease: "none",
           yoyo: true,
         });
+
         animationRef.current.push(_aniRotation);
         break;
 

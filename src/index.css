@@ -119,19 +119,20 @@ body {
   aspect-ratio: 1/1;
   content: "";
   border-radius: 100%;
-  background-color: var(--color-primary);
-  box-shadow: 0 0 15px var(--color-primary);
+  background-image: radial-gradient(circle at 30% 30%,#fff 0%,#f4b94c 25%,var(--color-primary) 70% 90%,#f4b94c 100%);
+  /* background-color: var(--color-primary); */
+  box-shadow: 0 0 20px #f4b94c;
 }
 .loadingAnime:after {
   position: absolute;
-  left: 1.25vw;
-  top: 1.25vw;
+  left: 1.2vw;
+  top: 1.2vw;
   width: 2vw;
   aspect-ratio: 1/1;
   content: "";
   border-radius: 100%;
-  background-color: #fcd134;
-  box-shadow: 0 0 15px #fcd134;
+  background-color: #f4b94c;
+  box-shadow: 0 0 15px #ffffff;
 }
 
 @keyframes star {
