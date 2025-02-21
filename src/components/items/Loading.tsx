@@ -5,11 +5,10 @@ import { useLoadingContext } from "@app/context/LoadingContext";
 import gsap from "gsap";
 
 const Loading = () => {
-    const { isLoading, setIsLoading, loadingProgress, setLoadingProgress } = useLoadingContext();
+    const { isLoading,setIsLoading, setLoadingProgress } = useLoadingContext();
     const loadingRef = useRef<HTMLDivElement>(null);
     const loadingTxtRef = useRef<HTMLSpanElement>(null);
     const [progressMap, setProgressMap] = useState<Record<string, number>>({});
-    const [fakeProgress, setFakeProgress] = useState(0);
 
     // 確保 `assets` 陣列不會在重新渲染時變更
     const assets = useMemo(() => ([
@@ -71,13 +70,6 @@ const Loading = () => {
                     });
                 }, 500);
             });
-            
-            //設置假進度
-            const fakeProgressInterval = setInterval(() => {
-                setFakeProgress(prev => Math.min(prev + 0.5, 95));
-            }
-            , 500);
-            return () => clearInterval(fakeProgressInterval);
         }
     }, [isLoading]);
 
@@ -90,8 +82,10 @@ const Loading = () => {
     }, [totalProgress]);
 
     return isLoading ? (
-        <div ref={loadingRef} className="loading w-full h-full fixed top-0 left-0 flex justify-center items-center bg-black bg-opacity-80 backdrop-blur-2xl z-50">
-            <span ref={loadingTxtRef}>Loading...{loadingProgress==="0"?fakeProgress:loadingProgress}%</span>
+        <div ref={loadingRef} className="loading w-full h-full fixed top-0 left-0 flex flex-col gap-5 justify-center items-center bg-black bg-opacity-80 backdrop-blur-2xl z-50">
+            {/* <span ref={loadingTxtRef}>Loading...{loadingProgress==="0"?fakeProgress:loadingProgress}%</span> */}
+            <div className="loadingAnime"></div>
+            <span ref={loadingTxtRef}>Loading...</span>
         </div>
     ) : null;
 };

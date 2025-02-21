@@ -97,3 +97,49 @@ body {
     opacity: 0;
   }
 }
+
+
+/* loading */
+
+.loadingAnime {
+  width: 15vw;
+  aspect-ratio: 1/1;
+  position: relative;
+  animation: star 3s infinite linear;
+  border: 1px solid #ffffff;
+  border-radius: 100%;
+}
+
+.loadingAnime:before{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%); 
+  width: 7.5vw;
+  aspect-ratio: 1/1;
+  content: "";
+  border-radius: 100%;
+  background-color: var(--color-primary);
+  box-shadow: 0 0 15px var(--color-primary);
+}
+.loadingAnime:after {
+  position: absolute;
+  left: 1.25vw;
+  top: 1.25vw;
+  width: 2vw;
+  aspect-ratio: 1/1;
+  content: "";
+  border-radius: 100%;
+  background-color: #fcd134;
+  box-shadow: 0 0 15px #fcd134;
+}
+
+@keyframes star {
+  from {
+    transform: rotate(0);
+  }
+
+  to {
+    transform: rotateZ(360deg);
+  }
+}
