@@ -127,9 +127,6 @@ const HomePage = () => {
             duration: 1,
             onComplete: () => {
               setIsResult(true);
-              if (canvasRef.current) {
-                canvasRef.current.style.display = "none";
-              }
               actionDispatch({ type: "SET_MODE", mode: getNextMode(ActionMode.FINISH_DRAW_CARDS) });
             },
           });

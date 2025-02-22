@@ -139,6 +139,7 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
   //動畫製作
   useGSAP(() => {
     if (!cardRef.current) return;
+    console.log(actionMode)
 
     if (animationRef.current.length > 0) {
       animationRef.current.forEach((anim) => anim.kill())
@@ -342,6 +343,7 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
         break;
       }
       case ActionMode.READ_CARDS: {
+
         // 卡片緩慢旋轉
         const _aniRotation = gsap.fromTo(cardRef.current.rotation,
           {
