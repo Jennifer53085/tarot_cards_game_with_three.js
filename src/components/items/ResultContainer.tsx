@@ -19,7 +19,11 @@ import { useActionModeContext } from '@app/context/ActionModeContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faArrowRight,faArrowLeft} from '@fortawesome/free-solid-svg-icons';
 
-const ResultContainer: React.FC = () => {
+interface resultProp{
+    isResult:boolean;
+}
+
+const ResultContainer: React.FC<resultProp> = ({isResult}) => {
     const { clearCards } = useCardsContext();//需要把原本的清空
     const { eventState, eventDispatch } = useEventContext();
     const { actionDispatch } = useActionModeContext();
@@ -31,6 +35,15 @@ const ResultContainer: React.FC = () => {
     const resultContainerRef = useRef<HTMLDivElement>(null);
     const cardContainerRef = useRef<HTMLDivElement>(null);
     const resultCanvasRef = useRef<HTMLCanvasElement>(null);
+
+
+  //顯示結果頁面
+  useEffect(() => { 
+    if (isResult) {
+      gsap.fromTo(resultContainerRef.current, { opacity: 0 }, { opacity: 1, duration: 1 });
+      gsap.fromTo(resultCanvasRef.current, { scale: 0 }, { scale: 1, duration: 1.5 });
+    }
+  }, [isResult]);
 
     useEffect(() => {
         if (eventState.pickArr.length !== totalDrawCards) return;

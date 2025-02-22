@@ -142,12 +142,7 @@ const HomePage = () => {
   };
 
 
-  //顯示結果頁面
-  useEffect(() => { 
-    if (isResult) {
-      gsap.fromTo("main", { opacity: 0 }, { opacity: 1, duration: 1 });
-    }
-  }, [isResult]);
+
 
 
 
@@ -203,7 +198,7 @@ const HomePage = () => {
         onPointerUp={handleNextStep}
       >{btnText}</button>}
 
-      {isResult && <ResultContainer />}
+      {isResult && <ResultContainer isResult={isResult}/>}
       <footer className='fixed bottom-[0.5rem] left-0 right-0 z-10 text-center text-white text-xs'>
         Copyright&nbsp;&copy;
         <span id="year"></span>&nbsp;

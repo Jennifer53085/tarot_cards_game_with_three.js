@@ -25,7 +25,7 @@ interface CardProps extends MeshProps {
 const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) => {
   const defaultPosition = tablePosition || new THREE.Vector3(0, 0, 0);
   const { actionMode, actionDispatch } = useActionModeContext();
-  const { cardsRef, addCard,clearCards } = useCardsContext();
+  const { cardsRef, addCard } = useCardsContext();
   const { eventState } = useEventContext();
   const cardRef = useRef<THREE.Mesh>(null!);
   const front = useTexture(`${import.meta.env.BASE_URL}${tarotCardsData[num].imgUrl}`);
@@ -116,9 +116,6 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
   // }, [isHover]);
 
   useEffect(() => {
-    if(actionMode===ActionMode.READ_CARDS){
-      clearCards();
-    }
 
     if (cardsRef.current.indexOf(cardRef.current) === -1) {
       addCard(cardRef.current);
