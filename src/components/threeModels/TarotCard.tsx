@@ -136,7 +136,7 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
       setPosition(cardRef.current.position);
       setRotation(cardRef.current.rotation);
     }
-  }, [ num, eventState, actionMode,isReverse]);
+  }, [ num, eventState.pickArr, actionMode,isReverse]);
 
   //動畫製作
   useGSAP(() => {

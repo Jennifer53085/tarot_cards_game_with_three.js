@@ -58,6 +58,20 @@ body {
   radial-gradient(ellipse at bottom, var(--color-primary), transparent);
   border-color:var(--color-primary);
 }
+
+.btn-final{
+  background-color: transparent;
+  border: 2px solid #fff;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.5s ease;
+}
+
+.btn-final :hover{
+  background:radial-gradient(ellipse at 0.5rem 0.5rem, #e3ac46b5, transparent),
+  radial-gradient(ellipse at bottom, var(--color-primary), transparent);
+  border-color:var(--color-primary);
+}
 .btn-card-control{
   background-color: transparent;
   padding: 0.25rem 0.5rem;

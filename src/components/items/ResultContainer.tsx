@@ -82,7 +82,8 @@ const ResultContainer: React.FC = () => {
     }, { dependencies: [isChange] })
 
     //重新抽牌
-    const restart = () => {
+    const restart = (event: React.PointerEvent<HTMLButtonElement>) => {
+        event.nativeEvent.preventDefault();
         eventDispatch({ type: "SET_PICK_TARGET", payload: [] });
         clearCards();
         actionDispatch({ type: "RESET_MODE" })
@@ -234,7 +235,7 @@ const ResultContainer: React.FC = () => {
         <>
             <main ref={resultContainerRef} className='w-[100vw] h-[70vh] overflow-hidden'>
                 {/* 卡片操作左右 */}
-                <div className='w-clamp-50vw h-[5vh] flex justify-between items-center mx-auto my-3'>
+                <div className='w-clamp-50vw h-[5dvh] flex justify-between items-center mx-auto my-3'>
                
                 
                     <button className="btn-card-control text-xs" onPointerUp={() => pressAction("prev")}>
@@ -247,10 +248,10 @@ const ResultContainer: React.FC = () => {
                     <FontAwesomeIcon icon={faArrowRight} />
                         </button>
                 </div>
-                <div ref={cardContainerRef} className={`resultCard relative left-1/2 transform -translate-x-1/2 w-clamp-50vw h-[55vh] flex flex-col justify-around items-center text-center`}>
-                    <div className='h-[10vh]'>
-                        <h1 className='text-2xl h-[6vh] leading-[6vh]'>{cardInformation?.cardName}</h1>
-                        <h2 className='text-xl h-[4vh] leading-[4vh]'>{cardInformation?.position}</h2>
+                <div ref={cardContainerRef} className={`resultCard relative left-1/2 transform -translate-x-1/2 w-clamp-50vw h-[55dvh] flex flex-col justify-around items-center text-center`}>
+                    <div className='h-[10dvh]'>
+                        <h1 className='text-2xl h-[6dvh] leading-[6dvh]'>{cardInformation?.cardName}</h1>
+                        <h2 className='text-xl h-[4dvh] leading-[4dvh]'>{cardInformation?.position}</h2>
                     </div>
                     <Canvas ref={resultCanvasRef} style={{ background: 'transparent' }}>
                         <CameraController />
@@ -265,9 +266,9 @@ const ResultContainer: React.FC = () => {
                         />
                         <TarotCard num={cardInformation?.cardId} isReverse={cardInformation?.isReverse} />
                     </Canvas>
-                    <p className='h-[10vh] flex justify-center items-center p-5'>{cardInformation?.cardContent}</p>
+                    <p className='h-[10dvh] flex justify-center items-center p-5'>{cardInformation?.cardContent}</p>
                 </div>
-                <button className='btn-outline w-clamp-50vw h-[5vh] fixed bottom-[5vh] left-1/2 transform -translate-x-1/2'
+                <button className='btn-final w-[clamp(100px,50dvw,200px)] h-[5dvh] pt-0 relative left-1/2 transform -translate-x-1/2'
                     onPointerUp={restart}> Restart?</button>
             </main>
             {/* 重抽按鈕 */}

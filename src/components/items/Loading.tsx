@@ -71,7 +71,7 @@ const Loading = () => {
                 }, 500);
             });
         }
-    }, [isLoading]);
+    }, [isLoading,assets]);
 
     useEffect(() => {
         console.log(totalProgress)
