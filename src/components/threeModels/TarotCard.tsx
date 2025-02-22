@@ -44,8 +44,6 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
   // const shaderMaterialRef = useRef<THREE.ShaderMaterial>(null!);
 
 
-
-
   // TODO之後有時間研究
   //製作發光體
   //   const fragmentShader = `
@@ -118,12 +116,15 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
   // }, [isHover]);
 
   useEffect(() => {
+    if(actionMode===ActionMode.READ_CARDS){
+      clearCards();
+    }
 
-      if (cardsRef.current.indexOf(cardRef.current) === -1) {
-        addCard(cardRef.current);
-      }
-    
-  }, [cardsRef,addCard])
+    if (cardsRef.current.indexOf(cardRef.current) === -1) {
+      addCard(cardRef.current);
+    }
+
+  }, [cardsRef, addCard])
 
   //設置位置
   useEffect(() => {
@@ -136,7 +137,7 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
       setPosition(cardRef.current.position);
       setRotation(cardRef.current.rotation);
     }
-  }, [ num, eventState.pickArr, actionMode,isReverse]);
+  }, [num, eventState.pickArr, actionMode]);
 
   //動畫製作
   useGSAP(() => {
@@ -147,7 +148,7 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
     }
 
     switch (actionMode) {
-    
+
       case ActionMode.DEFAULT: {
         // 卡片緩慢旋轉
         const _aniRotation = gsap.to(cardRef.current.rotation, {
@@ -344,15 +345,14 @@ const TarotCard: React.FC<CardProps> = ({ tablePosition, num = 0, isReverse }) =
         break;
       }
       case ActionMode.READ_CARDS: {
-                clearCards();
         // 卡片緩慢旋轉
-        const _aniRotation = gsap.fromTo(cardRef.current.rotation, 
+        const _aniRotation = gsap.fromTo(cardRef.current.rotation,
           {
-          y:-Math.PI/4,
-        },{
+            y: -Math.PI / 4,
+          }, {
           y: "+= 120 * Math.PI",
           repeat: -1,
-          duration: animationDuration *360,
+          duration: animationDuration * 360,
           ease: "none",
           yoyo: true,
         });
