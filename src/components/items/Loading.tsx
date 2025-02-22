@@ -30,8 +30,8 @@ const Loading = () => {
     // 使用 axios 加載資源並監測進度
     const loadAssetWithProgress = async (url: string, name: string) => {
         try {
-            const cacheBuster = `?nocache=${Date.now()}`;
-            const response = await axios.get(url + cacheBuster, {
+            // const cacheBuster = `?nocache=${Date.now()}`;
+            const response = await axios.get(url, {
                 responseType: "blob",
                 onDownloadProgress: (progressEvent) => {
                     if (progressEvent.total) {

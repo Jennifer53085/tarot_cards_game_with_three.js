@@ -145,8 +145,8 @@ const HomePage = () => {
   //顯示結果頁面
   useEffect(() => {
     if (isResult) {
-      gsap.fromTo("main", { opacity: 0 }, { opacity: 1, duration: 1 });
       clearCards();
+      gsap.fromTo("main", { opacity: 0 }, { opacity: 1, duration: 1 });
     }
   }, [isResult]);
 
