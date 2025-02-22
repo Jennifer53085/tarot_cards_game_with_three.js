@@ -37,7 +37,7 @@ const HomePage = () => {
   const [btnText, setBtnText] = useState("");
   const [isFlashing, setIsFlashing] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { cardsRef,clearCards } = useCardsContext();
+  const { cardsRef } = useCardsContext();
   const shuffleCountRef = useRef(0);
 
   //結果處理
@@ -143,9 +143,8 @@ const HomePage = () => {
 
 
   //顯示結果頁面
-  useEffect(() => {
+  useEffect(() => { 
     if (isResult) {
-      clearCards();
       gsap.fromTo("main", { opacity: 0 }, { opacity: 1, duration: 1 });
     }
   }, [isResult]);
