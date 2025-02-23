@@ -41,7 +41,7 @@ const ResultContainer: React.FC<resultProp> = ({isResult}) => {
   useEffect(() => { 
     if (isResult) {
       gsap.fromTo(resultContainerRef.current, { opacity: 0 }, { opacity: 1, duration: 1 });
-      gsap.fromTo(resultCanvasRef.current, { scale: 0 }, { scale: 1, duration: 1.5 });
+      gsap.fromTo(resultCanvasRef.current, { scale: 0 }, { scale: 1,delay:0.5, duration: 0.5 });
     }
   }, [isResult]);
 
