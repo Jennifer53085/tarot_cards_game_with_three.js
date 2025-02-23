@@ -1,84 +1,75 @@
 import { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faVolumeHigh, faVolumeXmark } from '@fortawesome/free-solid-svg-icons';
+import { faVolumeHigh, faVolumeXmark } from "@fortawesome/free-solid-svg-icons";
 
 interface MusicPlayerProps {
-    style?: React.CSSProperties;
-    className?: string;
+  style?: React.CSSProperties;
+  className?: string;
 }
 
 const MusicPlayer: React.FC<MusicPlayerProps> = ({ style, className }) => {
-    const [isPlaying, setIsPlaying] = useState(false);
-    const audio = useRef(new Audio(`${import.meta.env.BASE_URL}assets/music/mysterious-night.mp3`));
-    const fadeInterval = useRef<number | undefined>(undefined);
-    const duration = 30;
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const gainNodeRef = useRef<GainNode | null>(null);//ios沒有支援直接更動Audio的volume，改用GainNode
+  const audioElementRef = useRef<HTMLAudioElement | null>(null);
 
-    useEffect(() => {
-        const currentAudio = audio.current;
+  useEffect(() => {
+    // 初始化 AudioContext
+    audioContextRef.current = new AudioContext();
+    const audioElement = new Audio(`${import.meta.env.BASE_URL}assets/music/mysterious-night.mp3`);
+    const track = audioContextRef.current.createMediaElementSource(audioElement);
+    const gainNode = audioContextRef.current.createGain();
 
-        currentAudio.loop = true;
+    track.connect(gainNode).connect(audioContextRef.current.destination);
 
-        if (isPlaying) {
-            // 音樂播放並且音量設為 1
-            fadeIn();
-        } else {
-            // 音樂暫停並開始淡出
-            fadeOut();
-        }
+    gainNode.gain.value = 0; // 預設音量為 0
 
-        // 清理定時器和音頻
-        return () => {
-            // 如果有正在進行的淡出定時器，清理它
-            if (fadeInterval.current) {
-                clearInterval(fadeInterval.current);
-            }
-        };
-    }, [isPlaying]); // 只有當 isPlaying 改變時才會觸發
+    // 存到 Ref
+    audioElementRef.current = audioElement;
+    gainNodeRef.current = gainNode;
 
-    const togglePlay = (event: React.PointerEvent<HTMLButtonElement>) => {
-        event.nativeEvent.stopImmediatePropagation()//限制事件影響範圍
-        setIsPlaying((prev) => !prev);
+    return () => {
+      // 清理資源
+      audioElementRef.current?.pause();
+      audioElementRef.current = null;
+      gainNodeRef.current = null;
+      audioContextRef.current?.close();
+      audioContextRef.current = null;
     };
+  }, []);
 
-    const fadeIn = () => {
-        if (audio.current.volume === 1) return; // 如果音量已經是 0，則不需要再次淡出
+  const togglePlay = () => {
+    if (!audioContextRef.current || !gainNodeRef.current || !audioElementRef.current) return;
 
-        fadeInterval.current = window.setInterval(() => {
-            if (audio.current.volume < 1) {
-                // 確保音量不大於 0，避免出現非常小的負數
-                audio.current.volume = Math.min(audio.current.volume + (1 / duration), 1);
-            } else {
-                clearInterval(fadeInterval.current);
-                audio.current.play();
-            }
-        }, duration);
+    if (isPlaying) {
+      // 淡出
+      gainNodeRef.current.gain.linearRampToValueAtTime(0, audioContextRef.current.currentTime + 1);
+      setTimeout(() => {
+        audioElementRef.current?.pause();
+      }, 1000);
+    } else {
+      // 開啟 AudioContext
+      if (audioContextRef.current.state === "suspended") {
+        audioContextRef.current.resume();
+      }
 
+      // 播放音樂並淡入
+      audioElementRef.current.play();
+      gainNodeRef.current.gain.linearRampToValueAtTime(1, audioContextRef.current.currentTime + 1);
     }
 
-    const fadeOut = () => {
-        if (audio.current.volume === 0) return; // 如果音量已經是 0，則不需要再次淡出
+    setIsPlaying((prev) => !prev);
+  };
 
-        fadeInterval.current = window.setInterval(() => {
-            if (audio.current.volume > 0) {
-                // 確保音量不小於 0，避免出現非常小的負數
-                audio.current.volume = Math.max(audio.current.volume - (1 / duration), 0);
-            } else {
-                // 音量為 0 時停止音樂
-                clearInterval(fadeInterval.current);
-                audio.current.pause();
-            }
-        }, duration);
-    };
-
-    return (
-        <div style={style} className={className}>
-            <button onPointerUp={(event) => togglePlay(event)} className='btn-media'>
-                <FontAwesomeIcon icon={isPlaying ? faVolumeHigh : faVolumeXmark} />
-                &nbsp;&nbsp;
-                <span>{isPlaying ? "On" : "Off"}</span>
-            </button>
-        </div>
-    );
+  return (
+    <div style={style} className={className}>
+      <button onClick={togglePlay} className="btn-media">
+        <FontAwesomeIcon icon={isPlaying ? faVolumeHigh : faVolumeXmark} />
+        &nbsp;&nbsp;
+        <span>{isPlaying ? "On" : "Off"}</span>
+      </button>
+    </div>
+  );
 };
 
 export default MusicPlayer;
