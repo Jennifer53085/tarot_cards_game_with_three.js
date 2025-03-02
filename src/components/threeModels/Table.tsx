@@ -90,7 +90,7 @@ const Table: React.FC<GroupProps> = () => {
   )
 }
 
-useGLTF.preload(`${import.meta.env.BASE_URL}assets/models/forturntable.glb`)
+// useGLTF.preload(`${import.meta.env.BASE_URL}assets/models/forturntable.glb`)
 
 
 export default Table;
