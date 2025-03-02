@@ -19,6 +19,9 @@ import { getNextMode } from '@app/utils/function';
 import PointerRaycaster from '@app/components/controller/PointerRaycaster';
 import { totalCards } from '@app/utils/config';
 
+import { useLanguageContext } from '@app/context/LanguageContext';
+import { cardActionText } from '@app/data/userInterfaceText';
+
 import gsap from "gsap";
 import ResultContainer from '@app/components/items/ResultContainer';
 
@@ -26,7 +29,6 @@ import ResultContainer from '@app/components/items/ResultContainer';
 
 /*
 tips：three.js canvas記得加上useRef以避免重新渲染
-
 */
 //首頁
 const HomePage = () => {
@@ -39,6 +41,9 @@ const HomePage = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { cardsRef } = useCardsContext();
   const shuffleCountRef = useRef(0);
+
+  //顯示語系
+  const { language } = useLanguageContext();
 
   //結果處理
   const [isResult, setIsResult] = useState(false);
@@ -76,40 +81,55 @@ const HomePage = () => {
   }, [actionMode, getShuffleCardsOrder]);
 
   //控制洗牌過程
-  useEffect(() => {
-    switch (actionMode) {
-      case ActionMode.DEFAULT:
-        setBtnText("Reading Fortune");
-        setIsResult(false);
-        break;
-      case ActionMode.SHUFFLE_CARDS:
-        setIsFlashing(true);
-        setBtnText("Tap the Cards to Shuffle");
-        break;
-      case ActionMode.START_SHUFFLE_CARDS:
-        setBtnText("Hold to Keep Shuffling");
+  // useEffect(() => {
+  //   switch (actionMode) {
+  //     case ActionMode.DEFAULT:
+  //       setBtnText("Reading Fortune");
+  //       setIsResult(false);
+  //       break;
+  //     case ActionMode.SHUFFLE_CARDS:
+  //       setIsFlashing(true);
+  //       setBtnText("Tap the Cards to Shuffle");
+  //       break;
+  //     case ActionMode.START_SHUFFLE_CARDS:
+  //       setBtnText("Hold to Keep Shuffling");
 
-        break;
-      case ActionMode.FINISH_SHUFFLE_CARDS:
-        //至少洗一次牌才可以進行下一步動作
-        if (shuffleCountRef.current > 0) {
-          setBtnText("Is it Complete?");
-          setIsFlashing(false);
-        }
-        break;
-      case ActionMode.DRAW_CARDS:
-      case ActionMode.START_DRAW_CARDS:
-        setBtnText("Pick 3 Cards to Continue");
-        break;
-      case ActionMode.FINISH_DRAW_CARDS:
-        setBtnText("Reading result?");
-        break;
-      default:
-        setIsFlashing(false);
-        setBtnText("");
-        break;
+  //       break;
+  //     case ActionMode.FINISH_SHUFFLE_CARDS:
+  //       //至少洗一次牌才可以進行下一步動作
+  //       if (shuffleCountRef.current > 0) {
+  //         setBtnText("Is it Complete?");
+  //         setIsFlashing(false);
+  //       }
+  //       break;
+  //     case ActionMode.DRAW_CARDS:
+  //     case ActionMode.START_DRAW_CARDS:
+  //       setBtnText("Pick 3 Cards to Continue");
+  //       break;
+  //     case ActionMode.FINISH_DRAW_CARDS:
+  //       setBtnText("Reading result?");
+  //       break;
+  //     default:
+  //       setIsFlashing(false);
+  //       setBtnText("");
+  //       break;
+  //   }
+  // }, [actionMode, shuffleCountRef]);
+
+  //控制指引UI顯示
+  useEffect(() => {
+    if (actionMode === ActionMode.READ_CARDS) return;
+    const _text = cardActionText[actionMode][language];
+    setBtnText(_text || "");
+    
+    if (actionMode === ActionMode.DEFAULT) {
+      setIsResult(false);
+    } else if (actionMode === ActionMode.SHUFFLE_CARDS) {
+      setIsFlashing(true);
+    } else {
+      setIsFlashing(false);
     }
-  }, [actionMode, shuffleCountRef]);
+  }, [actionMode, shuffleCountRef, language]);
 
   const handleNextStep = (event: React.PointerEvent<HTMLButtonElement>) => {
     event.nativeEvent.stopImmediatePropagation();//stopImmediatePropagation可以避免同一個元件上的不同事件衝突
@@ -195,7 +215,7 @@ const HomePage = () => {
         onPointerUp={handleNextStep}
       >{btnText}</button>}
 
-      {isResult && <ResultContainer isResult={isResult}/>}
+      {isResult && <ResultContainer isResult={isResult} />}
       <footer className='fixed bottom-[0.5rem] left-0 right-0 z-10 text-center text-white text-xs'>
         Copyright&nbsp;&copy;
         <span id="year"></span>&nbsp;

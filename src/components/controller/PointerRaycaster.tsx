@@ -53,13 +53,16 @@ const PointerRaycaster = () => {
             case ActionMode.FINISH_SHUFFLE_CARDS:
                 {
                     const _handlePointerDown = (event: PointerEvent) => {
-                        event.stopPropagation();
-                        handlePointerPosition(event);
-                        raycasterRef.current.setFromCamera(mouseVectorRef.current, camera);
-                        const intersects = raycasterRef.current.intersectObjects(cardsObj);
-                        event.preventDefault();
-                        if (intersects.length > 0) {
-                            setStartShuffleMode();
+                        const target = event.target as HTMLElement;   // 限制事件僅在卡片上觸發
+                        if (target.nodeName !== "SELECT" && target.nodeName !== "BUTTON") { // 確保這不會影響到 select及按鈕
+                            event.stopPropagation();
+                            handlePointerPosition(event);
+                            raycasterRef.current.setFromCamera(mouseVectorRef.current, camera);
+                            const intersects = raycasterRef.current.intersectObjects(cardsObj);
+                            event.preventDefault();
+                            if (intersects.length > 0) {
+                                setStartShuffleMode();
+                            }
                         }
                     };
                     const _handlePointerUp = (event: PointerEvent) => {

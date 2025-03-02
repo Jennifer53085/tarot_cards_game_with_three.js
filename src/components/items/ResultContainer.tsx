@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState,useMemo } from 'react';
 import { useEventContext } from '@app/context/EventContext';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import CameraController from '@app/components/controller/CameraController'; // 相機控制器
 import TarotCard from '@app/components/threeModels/TarotCard';
-import { animationDuration, language, totalDrawCards } from '@app/utils/config'; // 顯示文字語系
+import { animationDuration, totalDrawCards } from '@app/utils/config'; // 顯示文字語系
+import { useLanguageContext } from '@app/context/LanguageContext';
+import { resultActionText,cardDirectionText,spreadsText } from '@app/data/userInterfaceText';
 import { tarotCardsData } from '@app/data/tarotCardsData'; // 塔羅牌相關資料
 import { useCardsContext } from "@app/context/CardsContext";
 
@@ -19,23 +21,25 @@ import { useActionModeContext } from '@app/context/ActionModeContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faArrowRight,faArrowLeft} from '@fortawesome/free-solid-svg-icons';
 
+
 interface resultProp{
     isResult:boolean;
 }
 
 const ResultContainer: React.FC<resultProp> = ({isResult}) => {
+    const {language}=useLanguageContext();
     const { clearCards } = useCardsContext();//需要把原本的清空
     const { eventState, eventDispatch } = useEventContext();
     const { actionDispatch } = useActionModeContext();
-    const resultArr = ["Past", "Now", "Future"];
     const [showIndex, setShowIndex] = useState(0);
-    const [resultText, setResultText] = useState(resultArr[0]);
     const [cardInformation, setCardInformation] = useState<{ cardId: number, cardName: string, isReverse: boolean, position: string, cardContent: string } | null>(null);
     const [isChange, setIsChange] = useState(false);
     const resultContainerRef = useRef<HTMLDivElement>(null);
     const cardContainerRef = useRef<HTMLDivElement>(null);
     const resultCanvasRef = useRef<HTMLCanvasElement>(null);
 
+    const resultArr = useMemo(()=>spreadsText[language],[language]);
+    const [resultText, setResultText] = useState(resultArr[0]);
 
   //顯示結果頁面
   useEffect(() => { 
@@ -50,7 +54,7 @@ const ResultContainer: React.FC<resultProp> = ({isResult}) => {
         const defaultContent = eventState.pickArr[showIndex];
         const cardId = defaultContent.cardId;
         const cardName = tarotCardsData[cardId].lang[language].cardName;
-        const cardPositionText = defaultContent.isReverse ? "reversed" : "upright";
+        const cardPositionText = defaultContent.isReverse ? cardDirectionText["reversed"][language] : cardDirectionText["upright"][language];
         const cardReverseDataKey = defaultContent.isReverse ? "meaningReversed" : "meaningUpright";
         const cardContent = tarotCardsData[cardId].lang[language][cardReverseDataKey];
 
@@ -63,7 +67,11 @@ const ResultContainer: React.FC<resultProp> = ({isResult}) => {
         }
 
         setCardInformation(_data);
-    }, [eventState, showIndex])
+    }, [eventState, showIndex,language]);
+
+    useEffect(()=>{
+        setResultText(spreadsText[language][showIndex])
+    },[language,showIndex])
 
     //控制顯示卡片
     const pressAction = (action: string) => {
@@ -253,11 +261,11 @@ const ResultContainer: React.FC<resultProp> = ({isResult}) => {
                 
                     <button className="btn-card-control text-xs" onPointerUp={() => pressAction("prev")}>
                     <FontAwesomeIcon icon={faArrowLeft} />
-                    &nbsp; Prev card
+                    &nbsp; {resultActionText["prev"][language]}
                         </button>
                     <div className="text-2xl">{resultText}</div>
                     <button className="btn-card-control text-xs" onPointerUp={() => pressAction("next")}>
-                        Next card &nbsp;
+                    {resultActionText["next"][language]} &nbsp;
                     <FontAwesomeIcon icon={faArrowRight} />
                         </button>
                 </div>
@@ -282,7 +290,7 @@ const ResultContainer: React.FC<resultProp> = ({isResult}) => {
                     <p className='h-[10dvh] flex justify-center items-center p-5'>{cardInformation?.cardContent}</p>
                 </div>
                 <button className='btn-final w-[clamp(100px,50dvw,200px)] h-[5dvh] pt-0 relative left-1/2 transform -translate-x-1/2'
-                    onPointerUp={restart}> Restart?</button>
+                    onPointerUp={restart}> {resultActionText["restart"][language]}</button>
             </main>
             {/* 重抽按鈕 */}
         </>

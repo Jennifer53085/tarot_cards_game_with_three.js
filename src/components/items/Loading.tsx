@@ -2,10 +2,13 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import axios from "axios";
 import { totalCards } from '@app/utils/config';
 import { useLoadingContext } from "@app/context/LoadingContext";
+import { useLanguageContext } from "@app/context/LanguageContext";
+import { loadingText } from "@app/data/userInterfaceText";
 import gsap from "gsap";
 
 const Loading = () => {
     const { isLoading,setIsLoading, setLoadingProgress } = useLoadingContext();
+    const {language}=useLanguageContext();
     const loadingRef = useRef<HTMLDivElement>(null);
     const loadingTxtRef = useRef<HTMLSpanElement>(null);
     const [progressMap, setProgressMap] = useState<Record<string, number>>({});
@@ -85,7 +88,7 @@ const Loading = () => {
         <div ref={loadingRef} className="loading w-full h-full fixed top-0 left-0 flex flex-col gap-5 justify-center items-center bg-black bg-opacity-80 backdrop-blur-2xl z-50">
             {/* <span ref={loadingTxtRef}>Loading...{loadingProgress==="0"?fakeProgress:loadingProgress}%</span> */}
             <div className="loadingAnime"></div>
-            <span ref={loadingTxtRef}>Loading...</span>
+            <span ref={loadingTxtRef}>{loadingText[language]}</span>
         </div>
     ) : null;
 };
