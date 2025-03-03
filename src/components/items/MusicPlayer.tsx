@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolumeHigh, faVolumeXmark } from "@fortawesome/free-solid-svg-icons";
 import { useLanguageContext } from "@app/context/LanguageContext";
 import { musicPlayerText } from "@app/data/userInterfaceText";
+import { useLoadingContext } from "@app/context/LoadingContext";
 
 interface MusicPlayerProps {
   style?: React.CSSProperties;
@@ -14,7 +15,8 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ style, className }) => {
   const audioContextRef = useRef<AudioContext | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);//ios沒有支援直接更動Audio的volume，改用GainNode
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
-  const {language}=useLanguageContext();
+  const { language } = useLanguageContext();
+  const { isLoading } = useLoadingContext();
 
   useEffect(() => {
     // 初始化 AudioContext
@@ -65,11 +67,11 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ style, className }) => {
   };
 
   return (
-      <button onClick={togglePlay} style={style} className={className}>
-        <FontAwesomeIcon icon={isPlaying ? faVolumeHigh : faVolumeXmark} />
-        &nbsp;&nbsp;
-        <span>{isPlaying ? musicPlayerText["on"][language] : musicPlayerText["off"][language]}</span>
-      </button>
+    <button onClick={togglePlay} style={{...style,opacity:isLoading?0:1}} className={className} disabled={isLoading}>
+      <FontAwesomeIcon icon={isPlaying ? faVolumeHigh : faVolumeXmark} />
+      &nbsp;&nbsp;
+      <span>{isPlaying ? musicPlayerText["on"][language] : musicPlayerText["off"][language]}</span>
+    </button>
   );
 };
 

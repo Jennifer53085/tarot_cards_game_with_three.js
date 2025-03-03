@@ -1,94 +1,88 @@
-import { useEffect, useRef, useState, useMemo } from "react";
-import axios from "axios";
+import { useEffect, useRef, useMemo } from "react";
 import { totalCards } from '@app/utils/config';
 import { useLoadingContext } from "@app/context/LoadingContext";
 import { useLanguageContext } from "@app/context/LanguageContext";
 import { loadingText } from "@app/data/userInterfaceText";
 import gsap from "gsap";
+import { TextureLoader, AudioLoader, LoadingManager } from "three";
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const Loading = () => {
-    const { isLoading,setIsLoading, setLoadingProgress } = useLoadingContext();
-    const {language}=useLanguageContext();
+    const { isLoading, setIsLoading, loadingProgress, setLoadingProgress } = useLoadingContext();
+    const { language } = useLanguageContext();
     const loadingRef = useRef<HTMLDivElement>(null);
     const loadingTxtRef = useRef<HTMLSpanElement>(null);
-    const [progressMap, setProgressMap] = useState<Record<string, number>>({});
 
     // 確保 `assets` 陣列不會在重新渲染時變更
     const assets = useMemo(() => ([
-        { url: `${import.meta.env.BASE_URL}assets/models/forturntable.glb`, name: "table" },
-        { url: `${import.meta.env.BASE_URL}assets/music/mysterious-night.mp3`, name: "music" },
-        { url: `${import.meta.env.BASE_URL}assets/texture/card_back.png`, name: "backCard" },
+        { url: `${import.meta.env.BASE_URL}assets/models/forturntable.glb`, type: "model" },
+        { url: `${import.meta.env.BASE_URL}assets/music/mysterious-night.mp3`, type: "music" },
+        { url: `${import.meta.env.BASE_URL}assets/texture/card_back.png`, type: "texture" },
         ...Array.from({ length: totalCards }, (_, i) => ({
             url: `${import.meta.env.BASE_URL}assets/texture/card${i}.png`,
-            name: `frontCard${i}`
+            type: "texture"
         })),
     ]), []);
 
-    // 計算總進度
-    const totalProgress = useMemo(() => {
-        if (Object.keys(progressMap).length === 0) return 0;
-        return Object.values(progressMap).reduce((sum, cur) => sum + cur, 0) / assets.length;
-    }, [progressMap, assets.length]);
+ 
+    useEffect(() => {
+        const manager = new LoadingManager();
+        const textureLoader = new TextureLoader(manager);
+        const audioLoader = new AudioLoader(manager);
+        const gltfLoader = new GLTFLoader(manager);
 
-    // 使用 axios 加載資源並監測進度
-    const loadAssetWithProgress = async (url: string, name: string) => {
-        try {
-            // const cacheBuster = `?nocache=${Date.now()}`;
-            const response = await axios.get(url, {
-                responseType: "blob",
-                onDownloadProgress: (progressEvent) => {
-                    if (progressEvent.total) {
-                        const percent = (progressEvent.loaded / progressEvent.total) * 100;
-                        updateTotalProgress(name, percent);
-                    }
-                },
-            });
-            return URL.createObjectURL(response.data);
-        } catch (error) {
-            console.error(`Failed to load asset: ${name}`, error);
-            updateTotalProgress(name, 100); // 確保失敗的資源也被標記為完成，避免卡住
-            return "";
+        let loadedCount = 0;
+
+        manager.onProgress = (_, itemsLoaded, itemsTotal) => {
+            setLoadingProgress(Math.round((itemsLoaded / itemsTotal) * 100));
+        };
+
+        manager.onLoad = () => {
+            setLoadingProgress(100);
+            setIsLoading(true);
+        };
+
+        manager.onError = (url) => {
+            console.error(`❌ Error loading: ${url}`);
+        };
+
+        // 開始載入所有資源
+        assets.forEach((asset) => {
+            switch (asset.type) {
+                case "texture":
+                    textureLoader.load(asset.url, () => updateProgress());
+                    break;
+                case "music":
+                    audioLoader.load(asset.url, () => updateProgress());
+                    break;
+                case "model":
+                    gltfLoader.load(asset.url, () => updateProgress());
+                    break;
+                default:
+                    console.warn(`⚠️ Unknown asset type: ${asset.type}`);
+            }
+        });
+
+        function updateProgress() {
+            loadedCount++;
+            setLoadingProgress(Math.round((loadedCount / assets.length) * 100));
         }
-    };
-
-    // 更新下載進度
-    const updateTotalProgress = (asset: string, progress: number) => {
-        setProgressMap(prev => ({
-            ...prev,
-            [asset]: progress === 100 ? 100 : progress
-        }));
-    };
+    }, [assets]);
 
     useEffect(() => {
-        if (isLoading) {
-            setProgressMap({}); // 清空進度
-            const promises = assets.map(asset => loadAssetWithProgress(asset.url, asset.name));
-
-            Promise.all(promises).then(() => {
-                setTimeout(() => {
-                    gsap.to(loadingRef.current, {
-                        opacity: 0,
-                        duration: 1.5,
-                        onComplete: () => setIsLoading(false),
-                    });
-                }, 500);
+        if (loadingProgress === 100) {
+            gsap.to(loadingRef.current, {
+                opacity: 0,
+                duration: 1.5,
+                onComplete: () => setIsLoading(false),
             });
         }
-    }, [isLoading,assets]);
-
-    useEffect(() => {
-        console.log(totalProgress)
-        setLoadingProgress(Math.min(totalProgress, 100).toFixed(2));
-        if (loadingTxtRef.current && totalProgress < 100) {
-            gsap.fromTo(loadingTxtRef.current, { opacity: 1 }, { opacity: 0, duration: 0.5, repeat: -1, yoyo: true, ease: "power1.inOut" });
-        }
-    }, [totalProgress]);
+    },[loadingProgress])
 
     return isLoading ? (
         <div ref={loadingRef} className="loading w-full h-full fixed top-0 left-0 flex flex-col gap-5 justify-center items-center bg-black bg-opacity-80 backdrop-blur-2xl z-50">
-            {/* <span ref={loadingTxtRef}>Loading...{loadingProgress==="0"?fakeProgress:loadingProgress}%</span> */}
             <div className="loadingAnime"></div>
-            <span ref={loadingTxtRef}>{loadingText[language]}</span>
+            <span ref={loadingTxtRef}>{loadingText[language]}{loadingProgress}%</span>
         </div>
     ) : null;
 };

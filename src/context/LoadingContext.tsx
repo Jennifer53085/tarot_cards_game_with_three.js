@@ -3,8 +3,8 @@ import React, { createContext, useState, useContext, ReactNode } from 'react';
 interface LoadingContextType {
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
-  loadingProgress: string;
-  setLoadingProgress: (loadingProgress: string | ((prev: string) => string)) => void;  // 允許回調函數
+  loadingProgress: number;
+  setLoadingProgress: (loadingProgress: number | ((prev: number) => number)) => void;  // 允許回調函數
 }
 
 
@@ -21,7 +21,7 @@ export const useLoadingContext = () => {
 
 export const LoadingProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [loadingProgress, setLoadingProgress] = useState("0");
+  const [loadingProgress, setLoadingProgress] = useState(0);
 
   return (
     <LoadingContext.Provider value={{ isLoading, setIsLoading, loadingProgress, setLoadingProgress }}>

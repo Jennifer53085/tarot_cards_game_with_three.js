@@ -22,6 +22,7 @@
 
 *{
   box-sizing: border-box;
+  transition: all 0.5s ease;
 }
 
 body {
@@ -34,12 +35,10 @@ body {
 }
 
 .btn-outline{
-
   background-color: transparent;
   border: 2px solid #fff;
   padding: 0.5rem 2rem;
   cursor: pointer;
-  transition: all 0.5s ease;
 }
 
 .btn-outline:hover{
@@ -53,7 +52,6 @@ body {
   border: 2px solid #fff;
   padding: 0;
   cursor: pointer;
-  transition: all 0.5s ease;
 }
 
 .btn-final :hover{
@@ -67,7 +65,6 @@ body {
   white-space: nowrap;
   width: clamp(fit-content,15vw,10rem);
   cursor: pointer;
-  transition: all 0.5s ease;
 }
 
 .btn-card-control:hover{
